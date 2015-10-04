@@ -271,6 +271,7 @@ function(GENERATE_LIB)
     endwhile()
 
     INCLUDE_DIRECTORIES(..)
+    INCLUDE_DIRECTORIES(.)
 
     file( GLOB SOURCE_FILES [Cc]/*.c [Cc]/*.cpp [Cc]/*.cxx *.cpp *.c *.cxx )
     file( GLOB HEADERS_FILES [Hh]/*.h [Hh]/*.hpp [Hh]/*.hxx [Hh][Pp][Pp]/*.hpp [Hh][Pp][Pp]/*.hxx *.h *.hpp *.hxx )
