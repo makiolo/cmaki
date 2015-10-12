@@ -1,3 +1,4 @@
+option(FIRST_ERROR "stop on first compilation error" FALSE)
 option(COVERAGE "active coverage (only clang)" FALSE)
 option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "")
 
@@ -32,7 +33,7 @@ macro(COMMONS_FLAGS)
 			SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -lgcov")
 		endif()
 	endif()
-	
+
 	if(NOT WIN32)
 		SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pthread" )
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -58,7 +59,7 @@ macro(ENABLE_MODERN_CPP)
         add_definitions(-Wall -pedantic -pedantic-errors -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion)
         add_definitions(-Wdisabled-optimization -Werror -Wfloat-equal -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k)
         add_definitions(-Wimport  -Winit-self  -Winline -Winvalid-pch -Wlong-long -Wmissing-field-initializers -Wmissing-format-attribute)
-		add_definitions(-Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith -Wredundant-decls -Wshadow)
+		add_definitions(-Wmissing-include-dirs -Wpacked -Wpointer-arith -Wredundant-decls -Wshadow)
         add_definitions(-Wstack-protector -Wunreachable-code -Wunused)
         add_definitions(-Wunused-parameter -Wvariadic-macros -Wwrite-strings)
 		add_definitions(-Wswitch-default -Wswitch-enum)
@@ -71,6 +72,7 @@ macro(ENABLE_MODERN_CPP)
 		add_definitions(-Wno-error=unused-variable)
 		add_definitions(-Wno-error=unused-parameter)
 		add_definitions(-Wno-error=deprecated-declarations)
+		add_definitions(-Wno-error=suggest-attribute=noreturn)
 
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			add_definitions(-Wno-aggregate-return)
@@ -84,6 +86,12 @@ macro(ENABLE_MODERN_CPP)
 
 		# In Linux default now is not export symbols
 		add_definitions(-fvisibility=hidden)
+
+		# stop in first error
+		if(FIRST_ERROR)
+			add_definitions(-Wfatal-errors)
+		endif()
+
     endif()
 
 	if (NOT DEFINED EXTRA_DEF)
@@ -312,7 +320,7 @@ function(GENERATE_LIB)
 		add_definitions(/wd4245)
 		# declaration of 'next' hides class membe
 		add_definitions(/wd4458)
-		
+
 		add_definitions(/WX /W4)
 	endif()
 
