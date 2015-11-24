@@ -62,6 +62,7 @@ macro(ENABLE_MODERN_CPP)
 		add_definitions(-Wmissing-include-dirs -Wpacked -Wpointer-arith -Wredundant-decls -Wshadow)
         add_definitions(-Wstack-protector -Wunreachable-code -Wunused)
         add_definitions(-Wunused-parameter -Wvariadic-macros -Wwrite-strings)
+        add_definitions(-Wdelete-non-virtual-dtor)
 		add_definitions(-Wswitch-default -Wswitch-enum)
 		# only gcc
 		# convert error in warnings
@@ -84,8 +85,9 @@ macro(ENABLE_MODERN_CPP)
 			add_definitions(-Wstrict-aliasing=2)
 		endif()
 
-		# In Linux default now is not export symbols
+		# no export symbols by default
 		add_definitions(-fvisibility=hidden)
+		add_definitions(-fvisibility-inlines-hidden)
 
 		# stop in first error
 		if(FIRST_ERROR)
