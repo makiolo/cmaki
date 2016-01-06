@@ -74,6 +74,7 @@ macro(ENABLE_MODERN_CPP)
 		add_definitions(-Wno-error=unused-parameter)
 		add_definitions(-Wno-error=deprecated-declarations)
 		add_definitions(-Wno-error=sign-conversion)
+		add_definitions(-Wno-error=switch-enum)
 
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			add_definitions(-Wno-error=suggest-attribute=noreturn)
