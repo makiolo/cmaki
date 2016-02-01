@@ -54,12 +54,11 @@ IF(WIN32)
 	endif(CMAKE_CL_64)
 ELSE()
 	execute_process(
-		COMMAND "./detect_operative_system.sh"
-		WORKING_DIRECTORY "${CMAKI_PATH}"
+		COMMAND sh detect_operative_system.sh
+		WORKING_DIRECTORY "${CMAKI_PATH}/ci"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
 ENDIF()
-MESSAGE(FATAL_ERROR "----------- ${CMAKI_PATH}/ci")
 MESSAGE("-- platform detected: ${CMAKI_PLATFORM}")
 
 function(cmaki_find_package PACKAGE)
