@@ -2,9 +2,18 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0011 NEW)
 cmake_policy(SET CMP0045 OLD)
 
-IF(NOT DEFINED CMAKE_PREFIX_PATH)
-	set(CMAKE_PREFIX_PATH ${CMAKE_MODULE_PATH}/../depends/cmakefiles)
+IF(NOT DEFINED ARTIFACTS_PATH)
+	set(ARTIFACTS_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 ENDIF()
+
+IF(NOT DEFINED CMAKI_PATH)
+	set(CMAKI_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmaki)
+ENDIF()
+
+IF(NOT DEFINED CMAKE_PREFIX_PATH)
+	set(CMAKE_PREFIX_PATH ${CMAKI_PATH}/../depends/cmakefiles)
+ENDIF()
+
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 set(PACKAGE_BASE_URL "http://localhost/artifacts")
 
@@ -42,7 +51,7 @@ IF(WIN32)
 ELSE()
 	execute_process(
 		COMMAND sh detect_operative_system.sh
-		WORKING_DIRECTORY "${CMAKE_MODULE_PATH}/ci"
+		WORKING_DIRECTORY "${CMAKI_PATH}/ci"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
 ENDIF()
@@ -58,8 +67,8 @@ function(cmaki_find_package PACKAGE)
 	# llamar a check_remote_version
 	# dando el nombre recibo la version
 	execute_process(
-		COMMAND python ${CMAKE_MODULE_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
-		WORKING_DIRECTORY "${CMAKE_MODULE_PATH}"
+		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
+		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	#MESSAGE("RESULT_VERSION1 = ${RESULT_VERSION}")
 	list(GET RESULT_VERSION 0 PACKAGE_MODE)
@@ -90,8 +99,8 @@ function(cmaki_find_package PACKAGE)
 			# generar artefactos de una version determinada
 
 			execute_process(
-				COMMAND python ${CMAKE_MODULE_PATH}/build.py ${PACKAGE} --depends=${CMAKE_MODULE_PATH}/../depends.yml --cmakefiles=${CMAKE_MODULE_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH}
-				WORKING_DIRECTORY "${CMAKE_MODULE_PATH}"
+				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.yml --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
+				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
 			if(artifacts_result)
@@ -102,8 +111,8 @@ function(cmaki_find_package PACKAGE)
 			# llamar a check_remote_version
 			# dando el nombre recibo la version
 			execute_process(
-				COMMAND python ${CMAKE_MODULE_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
-				WORKING_DIRECTORY "${CMAKE_MODULE_PATH}"
+				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
+				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 			#MESSAGE("RESULT_VERSION2 = ${RESULT_VERSION}")
 			list(GET RESULT_VERSION 0 PACKAGE_MODE)
@@ -117,16 +126,16 @@ function(cmaki_find_package PACKAGE)
 			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
 			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
 			execute_process(
-				COMMAND python ${CMAKE_MODULE_PATH}/upload_package.py --url=${PACKAGE_BASE_URL}/upload.php --filename=${package_generated_file}
-				WORKING_DIRECTORY "${CMAKE_MODULE_PATH}"
+				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${PACKAGE_BASE_URL}/upload.php --filename=${package_generated_file}
+				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE upload_result1
 				)
 			if(upload_result1)
 				message(FATAL_ERROR "error in upload ${package_generated_file})")
 			endif()
 			execute_process(
-				COMMAND python ${CMAKE_MODULE_PATH}/upload_package.py --url=${PACKAGE_BASE_URL}/upload.php --filename=${package_cmake_generated_file}
-				WORKING_DIRECTORY "${CMAKE_MODULE_PATH}"
+				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${PACKAGE_BASE_URL}/upload.php --filename=${package_cmake_generated_file}
+				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE upload_result2
 				)
 			if(upload_result2)
@@ -185,8 +194,8 @@ macro(cmaki_package_version_check)
 	# llamar a check_remote_version
 	# dando el nombre recibo la version
 	execute_process(
-		COMMAND python ${CMAKE_MODULE_PATH}/check_remote_version.py --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE_FIND_NAME} --version=${PACKAGE_FIND_VERSION}
-		WORKING_DIRECTORY "${CMAKE_MODULE_PATH}"
+		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE_FIND_NAME} --version=${PACKAGE_FIND_VERSION}
+		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	list(GET RESULT_VERSION 0 RESULT)
 	list(GET RESULT_VERSION 1 NAME)
@@ -253,7 +262,7 @@ macro(cmaki_download_package)
 	# URL implicita
 	# strip implicito
 
-	set(depends_dir "${CMAKE_MODULE_PATH}/../depends")
+	set(depends_dir "${CMAKI_PATH}/../depends")
 	get_filename_component(depends_dir "${depends_dir}" ABSOLUTE)
 	set(package_compessed "${depends_dir}/${package_name}.tar.gz")
 	set(package_uncompressed_dir "${depends_dir}/${package_name}.tmp")
