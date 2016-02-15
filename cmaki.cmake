@@ -537,12 +537,12 @@ function(DUNE_LIBRARY)
 	if(HAVE_PCH)
 
 		# TODO: problems clang
-		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			include(cotire)
-			set_target_properties(${LIBNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "h/${PCH_SOURCE}")
-			set_target_properties(${LIBNAME} PROPERTIES COTIRE_UNITY_LINK_LIBRARIES_INIT "COPY")
-			cotire(${LIBNAME})
-		endif()
+		# if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		# 	include(${CMAKE_CURRENT_LIST_DIR}/cmaki/ci/cotire.cmake)
+		# 	set_target_properties(${LIBNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "h/${PCH_SOURCE}")
+		# 	set_target_properties(${LIBNAME} PROPERTIES COTIRE_UNITY_LINK_LIBRARIES_INIT "COPY")
+		# 	cotire(${LIBNAME})
+		# endif()
 	endif()
 
 	GENERATE_CLANG()

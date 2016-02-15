@@ -45,7 +45,7 @@ ELSE()
 	get_filename_component(compiler ${CMAKE_CXX_COMPILER} NAME)
 	SET(CMAKI_COMPILER "${compiler}")
 ENDIF()
-MESSAGE("-- compiler detected: ${CMAKI_COMPILER}")
+# MESSAGE("-- compiler detected: ${CMAKI_COMPILER}")
 
 IF(WIN32)
 	if(CMAKE_CL_64)
@@ -60,7 +60,7 @@ ELSE()
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
 ENDIF()
-MESSAGE("-- platform detected: ${CMAKI_PLATFORM}")
+# MESSAGE("-- platform detected: ${CMAKI_PLATFORM}")
 
 function(cmaki_find_package PACKAGE)
 
@@ -192,9 +192,9 @@ function(cmaki_find_package PACKAGE)
 	set(CMAKI_INCLUDE_DIRS "${CMAKI_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(CMAKI_LIBRARIES "${CMAKI_LIBRARIES}" PARENT_SCOPE)
 
-	MESSAGE("package = ${PACKAGE}")
-	MESSAGE("includes = ${CMAKI_INCLUDE_DIRS}")
-	MESSAGE("libraries = ${CMAKI_LIBRARIES}")
+	# MESSAGE("package = ${PACKAGE}")
+	# MESSAGE("includes = ${CMAKI_INCLUDE_DIRS}")
+	# MESSAGE("libraries = ${CMAKI_LIBRARIES}")
 
 endfunction()
 
