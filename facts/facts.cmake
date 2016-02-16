@@ -70,15 +70,18 @@ function(cmaki_find_package PACKAGE)
 
 	# get version now
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${CMAKI_PATH}/../depends.yml
+		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${CMAKI_PATH}/../depends.json
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(RESULT_VERSION)
 		set(VERSION_REQUEST ${RESULT_VERSION})
 		set(EXTRA_VERSION "--version=${VERSION_REQUEST}")
 	else()
+		set(VERSION_REQUEST "")
 		set(EXTRA_VERSION "")
 	endif()
+
+	# MESSAGE(" python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION} ")
 
 	#######################################################
 	# get version in local cache or remote artifacts server
@@ -93,7 +96,9 @@ function(cmaki_find_package PACKAGE)
 		# message("---- found ${PACKAGE_NAME} (${VERSION})")
 		set(FORCE_GENERATE_ARTIFACT FALSE)
 	else()
-		message("can't get version for: ${PACKAGE}, request: ${VERSION_REQUEST}")
+		message("can't get version for: ${PACKAGE}, request: ${VERSION_REQUEST}, will be generated.")
+		# generate artifact with version request
+		set(VERSION ${VERSION_REQUEST})
 		set(FORCE_GENERATE_ARTIFACT TRUE)
 	endif()
 	#######################################################
@@ -119,7 +124,7 @@ function(cmaki_find_package PACKAGE)
 			# generar artefactos de una version determinada
 
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.yml --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
+				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
@@ -192,14 +197,21 @@ function(cmaki_find_package PACKAGE)
 	endif()
 
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.yml
+		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.json
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		RESULT_VARIABLE artifacts_result
 		)
 	if(artifacts_result)
 		message(FATAL_ERROR "can't save package version: ${PACKAGE} ${VERSION}")
 	endif()
-	find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
+
+	if(${PACKAGE_MODE} STREQUAL "EXACT")
+		# message("-- using ${PACKAGE} in EXACT")
+		find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
+	else()
+		# message("-- using ${PACKAGE} in COMPATIBLE")
+		find_package(${PACKAGE} ${VERSION} REQUIRED)
+	endif()
 
 	string(TOUPPER "${PACKAGE}" PACKAGE_UPPER)
 
