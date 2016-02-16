@@ -68,24 +68,39 @@ function(cmaki_find_package PACKAGE)
 		MESSAGE(FATAL_ERROR "PACKAGE_BASE_URL: is not defined")
 	ENDIF()
 
-	#######################################################
-	# llamar a check_remote_version
-	# dando el nombre recibo la version
+	# get version now
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
+		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${CMAKI_PATH}/../depends.yml
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-	#MESSAGE("RESULT_VERSION1 = ${RESULT_VERSION}")
-	list(GET RESULT_VERSION 0 PACKAGE_MODE)
-	list(GET RESULT_VERSION 1 PACKAGE_NAME)
-	list(GET RESULT_VERSION 2 VERSION)
-	#######################################################
+	if(RESULT_VERSION)
+		set(VERSION_REQUEST ${RESULT_VERSION})
+		set(EXTRA_VERSION "--version=${VERSION_REQUEST}")
+	else()
+		set(EXTRA_VERSION "")
+	endif()
 
-	set(FORCE FALSE)
+	#######################################################
+	# get version in local cache or remote artifacts server
+	execute_process(
+		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION}
+		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+	if(RESULT_VERSION)
+		list(GET RESULT_VERSION 0 PACKAGE_MODE)
+		list(GET RESULT_VERSION 1 PACKAGE_NAME)
+		list(GET RESULT_VERSION 2 VERSION)
+		# message("---- found ${PACKAGE_NAME} (${VERSION})")
+		set(FORCE_GENERATE_ARTIFACT FALSE)
+	else()
+		message("can't get version for: ${PACKAGE}, request: ${VERSION_REQUEST}")
+		set(FORCE_GENERATE_ARTIFACT TRUE)
+	endif()
+	#######################################################
 
 	# si no tengo los ficheros de cmake del paquete
 	set(depends_package ${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION})
-	if((NOT EXISTS "${depends_package}") OR ${FORCE})
+	if((NOT EXISTS "${depends_package}") OR ${FORCE_GENERATE_ARTIFACT})
 		# pido un paquete, en funcion de:
 		#		- paquete
 		#		- version
@@ -98,7 +113,7 @@ function(cmaki_find_package PACKAGE)
 		set(http_package_cmake_filename ${PACKAGE_BASE_URL}/download.php?file=${package_cmake_filename})
 		cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
 		# Si no puede descargar el artefacto (es posible no tener la version definida)
-		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE})
+		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE_GENERATE_ARTIFACT})
 
 			file(REMOVE "${package_uncompressed_file}")
 			# generar artefactos de una version determinada
@@ -175,7 +190,16 @@ function(cmaki_find_package PACKAGE)
 
 		endif()
 	endif()
-	find_package(${PACKAGE} ${VERSION} REQUIRED)
+
+	execute_process(
+		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.yml
+		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+		RESULT_VARIABLE artifacts_result
+		)
+	if(artifacts_result)
+		message(FATAL_ERROR "can't save package version: ${PACKAGE} ${VERSION}")
+	endif()
+	find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
 
 	string(TOUPPER "${PACKAGE}" PACKAGE_UPPER)
 
