@@ -237,20 +237,21 @@ function(cmaki_test)
 	MESSAGE("++ test ${_TEST_NAME}")
 	include_directories(.)
 	foreach(INCLUDE_DIR ${_INCLUDES})
-		target_include_directories(${_TEST_NAME}_exe ${INCLUDE_DIR})
+		target_include_directories(${_TEST_NAME} ${INCLUDE_DIR})
 	endforeach()
 	add_compile_options(-pthread)
-	add_executable(${_TEST_NAME}_exe ${_SOURCES})
-	target_link_libraries(${_TEST_NAME}_exe ${_DEPENDS})
-	target_link_libraries(${_TEST_NAME}_exe -lpthread)
+	add_executable(${_TEST_NAME} ${_SOURCES})
+	target_link_libraries(${_TEST_NAME} ${_DEPENDS})
+	target_link_libraries(${_TEST_NAME} -lpthread)
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-		INSTALL(    TARGETS ${_TEST_NAME}_exe
+		INSTALL(    TARGETS ${_TEST_NAME}
 					DESTINATION ${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
+
 	add_test(
-		NAME ${_TEST_NAME}_exe
-		COMMAND ${_TEST_NAME}_exe
+		NAME ${_TEST_NAME}__
+		COMMAND ${_TEST_NAME}
 		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
 
 endfunction()
