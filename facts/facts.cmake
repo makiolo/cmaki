@@ -81,8 +81,6 @@ function(cmaki_find_package PACKAGE)
 		set(EXTRA_VERSION "")
 	endif()
 
-	# MESSAGE(" python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION} ")
-
 	#######################################################
 	# get version in local cache or remote artifacts server
 	execute_process(
@@ -131,6 +129,9 @@ function(cmaki_find_package PACKAGE)
 			if(artifacts_result)
 				message(FATAL_ERROR "can't create artifact ${PACKAGE}")
 			endif()
+
+			# TODO: must set recent artifact created
+			# or integrate in pipeline
 
 			#######################################################
 			# llamar a check_remote_version
