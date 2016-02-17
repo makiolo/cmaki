@@ -379,6 +379,9 @@ macro(enable_modern_cpp)
 			add_definitions(-Wno-error=deprecated-register)
 			# poner override en metacommon y borrar
 			add_definitions(-Wno-error=inconsistent-missing-override)
+			add_definitions(-Wno-error=mismatched-tags)
+			add_definitions(-Wno-error=overloaded-virtual)
+			add_definitions(-Wno-error=unused-private-field)
 		endif()
 
 		# In Linux default now is not export symbols

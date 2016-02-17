@@ -197,7 +197,7 @@ function(cmaki_find_package PACKAGE)
 	endif()
 
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.json
+		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION_REQUEST} --depends=${CMAKI_PATH}/../depends.json
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		RESULT_VARIABLE artifacts_result
 		)
