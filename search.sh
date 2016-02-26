@@ -1,4 +1,4 @@
 #!/bin/bash
 
-ag -w --cpp $1 --ignore cmaki --ignore depends --ignore build --ignore artifacts
+ag -w --cpp $1 --ignore cmaki --ignore depends --ignore build --ignore artifacts --ignore baul
 

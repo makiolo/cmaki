@@ -12,9 +12,9 @@ fi
 
 if [[ $3 == "run" ]];
 then
-	echo run: "ag -w --cpp $1 -l --ignore cmaki --ignore depends --ignore build --ignore artifacts | xargs sed "s/\<$1\>/$2/g" $run"
+	echo run: "ag -w --cpp $1 -l --ignore cmaki --ignore depends --ignore build --ignore artifacts --ignore baul | xargs sed "s/\<$1\>/$2/g" $run"
 fi
-ag -w --cpp $1 -l --ignore cmaki --ignore depends --ignore build --ignore artifacts | xargs sed "s/\<$1\>/$2/g" $run
+ag -w --cpp $1 -l --ignore cmaki --ignore depends --ignore build --ignore artifacts --ignore baul | xargs sed "s/\<$1\>/$2/g" $run
 
 # candidates files
 if [[ $3 == "run" ]];
