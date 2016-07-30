@@ -124,7 +124,7 @@ function(cmaki_find_package PACKAGE)
 			file(REMOVE "${package_uncompressed_file}")
 
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o
+				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
