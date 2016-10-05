@@ -287,25 +287,27 @@ macro(common_flags)
 		# 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lgomp -lrt")
 		# endif()
 	else()
-		# c++ exceptions and RTTI
-		#add_definitions(/D_HAS_EXCEPTIONS=0)
-		#add_definitions(/GR-)
-		add_definitions(/wd4251)
-		add_definitions(/wd4275)
-		# Avoid warning as error with / WX / W4
-		# conversion from 'std::reference_wrapper<Chunk>' to 'std::reference_wrapper<Chunk> &
-		add_definitions(/wd4239)
-		# warning C4316: 'PhysicsManager' : object allocated on the heap may not be aligned 16
-		add_definitions(/wd4316)
-		# conditional expression is constant
-		add_definitions(/wd4127)
-		# conversion from 'int' to 'unsigned int', signed/unsigned mismatch
-		add_definitions(/wd4245)
-		# declaration of 'next' hides class membe
-		add_definitions(/wd4458)
+		if(NOT MINGW AND NOT MSYS)
+			# c++ exceptions and RTTI
+			#add_definitions(/D_HAS_EXCEPTIONS=0)
+			#add_definitions(/GR-)
+			add_definitions(/wd4251)
+			add_definitions(/wd4275)
+			# Avoid warning as error with / WX / W4
+			# conversion from 'std::reference_wrapper<Chunk>' to 'std::reference_wrapper<Chunk> &
+			add_definitions(/wd4239)
+			# warning C4316: 'PhysicsManager' : object allocated on the heap may not be aligned 16
+			add_definitions(/wd4316)
+			# conditional expression is constant
+			add_definitions(/wd4127)
+			# conversion from 'int' to 'unsigned int', signed/unsigned mismatch
+			add_definitions(/wd4245)
+			# declaration of 'next' hides class membe
+			add_definitions(/wd4458)
 
-		add_definitions(/WX /W4)
-		add_definitions(-Zm200)
+			add_definitions(/WX /W4)
+			add_definitions(-Zm200)
+		endif()
 	endif()
 
 	# include_directories(BEFORE ${TOOLCHAIN_ROOT}/include)
@@ -316,9 +318,11 @@ endmacro()
 macro(enable_modern_cpp)
 
 	if(WIN32)
-		add_definitions(/EHsc)
-		#add_definitions(/GR-)
-		#add_definitions(/D_HAS_EXCEPTIONS=0)
+		if(NOT MINGW AND NOT MSYS)
+			add_definitions(/EHsc)
+			#add_definitions(/GR-)
+			#add_definitions(/D_HAS_EXCEPTIONS=0)
+		endif()
 	else()
 		# add_definitions(-fno-rtti -fno-exceptions )
 		# activate all warnings and convert in errors
@@ -395,7 +399,7 @@ macro(enable_modern_cpp)
 	endif()
 
 	if (NOT DEFINED EXTRA_DEF)
-		if(NOT WIN32)
+		if(NOT WIN32 OR MINGW OR MSYS)
 			include(CheckCXXCompilerFlag)
 			CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 			CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
