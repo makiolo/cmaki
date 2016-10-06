@@ -239,20 +239,30 @@ function(cmaki_test)
 	foreach(INCLUDE_DIR ${_INCLUDES})
 		target_include_directories(${_TEST_NAME} ${INCLUDE_DIR})
 	endforeach()
-	add_compile_options(-pthread)
+	if(HAVE_PTHREADS)
+		add_compile_options(-pthread)
+	endif()
 	add_executable(${_TEST_NAME} ${_SOURCES})
 	target_link_libraries(${_TEST_NAME} ${_DEPENDS})
-	target_link_libraries(${_TEST_NAME} -lpthread)
+	if(HAVE_PTHREADS)
+		target_link_libraries(${_TEST_NAME} -lpthread)
+	endif()
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_TEST_NAME}
 					DESTINATION ${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 
-	add_test(
-		NAME ${_TEST_NAME}__
-		COMMAND ${_TEST_NAME}
-		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	IF(WIN32)
+		add_test(
+			NAME ${_TEST_NAME}__
+			COMMAND ${_TEST_NAME}
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	ELSE()
+		add_test(
+			NAME ${_TEST_NAME}__
+			COMMAND ${_TEST_NAME})
+	ENDIF()
 
 endfunction()
 
