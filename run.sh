@@ -27,10 +27,6 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
 	CXX=mingw32-g++
 fi
 
-# update depends
-git pull --recurse-submodules
-git submodule update --recursive
-
 echo "running in mode $MODE ... ($CC / $CXX)"
 mkdir -p $CC/$MODE
 cd $CC/$MODE
