@@ -81,8 +81,6 @@ function(cmaki_find_package PACKAGE)
 		set(EXTRA_VERSION "")
 	endif()
 
-	# MESSAGE(" python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION} ")
-
 	#######################################################
 	# get version in local cache or remote artifacts server
 	execute_process(
@@ -104,6 +102,7 @@ function(cmaki_find_package PACKAGE)
 	#######################################################
 
 	# si no tengo los ficheros de cmake del paquete
+	set(depends_bin_package "${CMAKI_PATH}/../depends/${PACKAGE}-${VERSION}")
 	set(depends_package ${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION})
 	if((NOT EXISTS "${depends_package}") OR ${FORCE_GENERATE_ARTIFACT})
 		# pido un paquete, en funcion de:
@@ -120,8 +119,9 @@ function(cmaki_find_package PACKAGE)
 		# Si no puede descargar el artefacto (es posible no tener la version definida)
 		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE_GENERATE_ARTIFACT})
 
+			file(REMOVE "${depends_bin_package}")
+			file(REMOVE "${depends_package}")
 			file(REMOVE "${package_uncompressed_file}")
-			# generar artefactos de una version determinada
 
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
@@ -131,6 +131,9 @@ function(cmaki_find_package PACKAGE)
 			if(artifacts_result)
 				message(FATAL_ERROR "can't create artifact ${PACKAGE}")
 			endif()
+
+			# TODO: must set recent artifact created
+			# or integrate in pipeline
 
 			#######################################################
 			# llamar a check_remote_version
@@ -399,6 +402,37 @@ function(cmaki2_library)
 		add_compile_options(-pthread)
 	endif()
 	add_library(${_LIBRARY_NAME} SHARED ${_SOURCES})
+	target_link_libraries(${_LIBRARY_NAME} ${_DEPENDS})
+	foreach(LIB_DIR ${CMAKI_LIBRARIES})
+		target_link_libraries(${_LIBRARY_NAME} ${LIB_DIR})
+		cmaki_install_3rdparty(${LIB_DIR})
+	endforeach()
+	if(HAVE_PTHREADS)
+		target_link_libraries(${_LIBRARY_NAME} -lpthread)
+	endif()
+	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
+		INSTALL(	TARGETS ${_LIBRARY_NAME}
+					DESTINATION ${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE})
+	endforeach()
+	generate_vcxproj_user(${_LIBRARY_NAME})
+
+endfunction()
+
+function(cmaki2_static_library)
+	cmaki_parse_parameters(${ARGV})
+	set(_LIBRARY_NAME ${_MAIN_NAME})
+	source_group( "Source Files" FILES ${_SOURCES} )
+	common_flags()
+	include_directories(..)
+	include_directories(h)
+	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
+		include_directories(${INCLUDE_DIR})
+	endforeach()
+	if(HAVE_PTHREADS)
+		add_compile_options(-pthread)
+	endif()
+	add_library(${_LIBRARY_NAME} STATIC ${_SOURCES})
 	target_link_libraries(${_LIBRARY_NAME} ${_DEPENDS})
 	foreach(LIB_DIR ${CMAKI_LIBRARIES})
 		target_link_libraries(${_LIBRARY_NAME} ${LIB_DIR})
