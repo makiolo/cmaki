@@ -19,12 +19,13 @@ fi
 # 	fi
 # fi
 
-GENERATOR=
 if [[ "$OSTYPE" == "cygwin" ]]; then
 	PATH=$(cygpath "E:\dev\gtc1\bin\cmake-3.4.3-win32-x86\bin"):$PATH
 	GENERATOR="MinGW Makefiles"
 	CC=mingw32-gcc
 	CXX=mingw32-g++
+else
+	GENERATOR="Unix Makefiles"
 fi
 
 echo "running in mode $MODE ... ($CC / $CXX)"
