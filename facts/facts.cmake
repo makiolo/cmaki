@@ -14,13 +14,13 @@ IF(NOT DEFINED CMAKI_PATH)
 	set(CMAKI_PATH ${CMAKE_MODULE_PATH})
 ENDIF()
 
-# MESSAGE("CMAKI_PATH = ${CMAKI_PATH}")
-# MESSAGE("ARTIFACTS_PATH = ${ARTIFACTS_PATH}")
-# MESSAGE("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
-# MESSAGE("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
-# MESSAGE(FATAL_ERROR)
-
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+if(DEFINED CMAKI_DEBUG)
+	MESSAGE("CMAKI_PATH = ${CMAKI_PATH}")
+	MESSAGE("ARTIFACTS_PATH = ${ARTIFACTS_PATH}")
+	MESSAGE("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
+	MESSAGE("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+	MESSAGE(FATAL_ERROR)
+endif()
 
 IF(WIN32)
 	if(MSVC12)
@@ -68,7 +68,7 @@ function(cmaki_find_package PACKAGE)
 		MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
 	ENDIF()
 
-	# get version now
+	# 1. obtener la version actual (o ninguno en caso de no tener el artefacto)
 	execute_process(
 		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${CMAKI_PATH}/../depends.json
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -82,7 +82,7 @@ function(cmaki_find_package PACKAGE)
 	endif()
 
 	#######################################################
-	# get version in local cache or remote artifacts server
+	# 2. obtener la mejor version buscando en la cache local y remota
 	execute_process(
 		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -91,17 +91,16 @@ function(cmaki_find_package PACKAGE)
 		list(GET RESULT_VERSION 0 PACKAGE_MODE)
 		list(GET RESULT_VERSION 1 PACKAGE_NAME)
 		list(GET RESULT_VERSION 2 VERSION)
-		# message("---- found ${PACKAGE_NAME} (${VERSION})")
 		set(FORCE_GENERATE_ARTIFACT FALSE)
+		message("-- cached package ${PACKAGE_NAME} (${VERSION})")
 	else()
-		message("can't get version for: ${PACKAGE}, request: ${VERSION_REQUEST}, will be generated.")
-		# generate artifact with version request
 		set(VERSION ${VERSION_REQUEST})
 		set(FORCE_GENERATE_ARTIFACT TRUE)
+		message("-- need build package ${PACKAGE_NAME} can't get version: ${VERSION_REQUEST}, will be generated.")
 	endif()
 	#######################################################
 
-	# si no tengo los ficheros de cmake del paquete
+	# 3. si no tengo los ficheros de cmake, los intento descargar
 	set(depends_bin_package "${CMAKI_PATH}/../depends/${PACKAGE}-${VERSION}")
 	set(depends_package ${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION})
 	if((NOT EXISTS "${depends_package}") OR ${FORCE_GENERATE_ARTIFACT})
@@ -115,14 +114,16 @@ function(cmaki_find_package PACKAGE)
 		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
 		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
 		set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
+		# 4. descargo el fichero que se supone tienes los ficheros cmake
 		cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
-		# Si no puede descargar el artefacto (es posible no tener la version definida)
+		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
 		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE_GENERATE_ARTIFACT})
 
 			file(REMOVE "${depends_bin_package}")
 			file(REMOVE "${depends_package}")
 			file(REMOVE "${package_uncompressed_file}")
 
+			# 5. compilo y genera el paquete en local
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -132,23 +133,18 @@ function(cmaki_find_package PACKAGE)
 				message(FATAL_ERROR "can't create artifact ${PACKAGE}")
 			endif()
 
-			# TODO: must set recent artifact created
-			# or integrate in pipeline
-
 			#######################################################
-			# llamar a check_remote_version
-			# dando el nombre recibo la version
+			# 6: obtengo la version del paquete recien creado
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-			#MESSAGE("RESULT_VERSION2 = ${RESULT_VERSION}")
 			list(GET RESULT_VERSION 0 PACKAGE_MODE)
 			list(GET RESULT_VERSION 1 PACKAGE_NAME)
 			list(GET RESULT_VERSION 2 VERSION)
 			#######################################################
 
-			# 2. Opcionalmente subo el artefacto
+			# 7. subo el artefacto y los ficheros de cmake
 			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}.tar.gz)
 			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
 			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
@@ -170,7 +166,7 @@ function(cmaki_find_package PACKAGE)
 				message(FATAL_ERROR "error in upload ${package_cmake_generated_file})")
 			endif()
 
-			# 3. Obligatoriamente descomprimo el artefacto
+			# 8. descomprimo el artefacto
 			execute_process(
 				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
 				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
@@ -179,13 +175,15 @@ function(cmaki_find_package PACKAGE)
 			if(uncompress_result)
 				message(FATAL_ERROR "Extracting ${package_cmake_generated_file} failed! Error ${uncompress_result}")
 			endif()
+			
+			# 9. borro los 2 tar gz
 			file(REMOVE "${package_generated_file}")
 			file(REMOVE "${package_cmake_generated_file}")
 
 		# me lo he descargdo y existe
 		elseif(EXISTS "${package_uncompressed_file}")
 
-			# lo descomprimo cacheado
+			# 10. lo descomprimo cacheado
 			execute_process(
 				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_uncompressed_file}"
 				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
@@ -199,6 +197,7 @@ function(cmaki_find_package PACKAGE)
 		endif()
 	endif()
 
+	# 11. Guardar nuestra version en uso
 	execute_process(
 		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.json
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -208,6 +207,7 @@ function(cmaki_find_package PACKAGE)
 		message(FATAL_ERROR "can't save package version: ${PACKAGE} ${VERSION}")
 	endif()
 
+	# 12. hacer find_package tradicional, ahora que tenemos todo
 	if(${PACKAGE_MODE} STREQUAL "EXACT")
 		# message("-- using ${PACKAGE} in EXACT")
 		find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
@@ -216,24 +216,24 @@ function(cmaki_find_package PACKAGE)
 		find_package(${PACKAGE} ${VERSION} REQUIRED)
 	endif()
 
+	# 13 añadir los includes
 	string(TOUPPER "${PACKAGE}" PACKAGE_UPPER)
-
 	foreach(INCLUDE_DIR ${${PACKAGE_UPPER}_INCLUDE_DIRS})
 		list(APPEND CMAKI_INCLUDE_DIRS "${INCLUDE_DIR}")
 	endforeach()
+	
+	# 14. añadir los libdir
 	foreach(LIB_DIR ${${PACKAGE_UPPER}_LIBRARIES})
 		list(APPEND CMAKI_LIBRARIES "${LIB_DIR}")
 	endforeach()
 
+	# 15. añadir variables especificas
 	set(${PACKAGE_UPPER}_INCLUDE_DIRS "${${PACKAGE_UPPER}_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(${PACKAGE_UPPER}_LIBRARIES "${${PACKAGE_UPPER}_LIBRARIES}" PARENT_SCOPE)
 
+	# 16. añaadir variabes generales
 	set(CMAKI_INCLUDE_DIRS "${CMAKI_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(CMAKI_LIBRARIES "${CMAKI_LIBRARIES}" PARENT_SCOPE)
-
-	# MESSAGE("package = ${PACKAGE}")
-	# MESSAGE("includes = ${CMAKI_INCLUDE_DIRS}")
-	# MESSAGE("libraries = ${CMAKI_LIBRARIES}")
 
 endfunction()
 
@@ -302,7 +302,7 @@ macro(cmaki_download_package)
 		MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
 	ENDIF()
 	get_filename_component(package_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
-	# ${package_name} en realidad es paquete + version
+	# ${package_name} en realidad es paquete + version (asyncply-0.0.0.0)
 	get_filename_component(package_name "${package_dir}" NAME)
 	set(package_cmake_filename ${package_name}-${CMAKI_PLATFORM}.tar.gz)
 	set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
@@ -417,7 +417,6 @@ function(cmaki2_library)
 					DESTINATION ${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-	generate_vcxproj_user(${_LIBRARY_NAME})
 
 endfunction()
 
@@ -448,7 +447,6 @@ function(cmaki2_static_library)
 					DESTINATION ${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-	generate_vcxproj_user(${_LIBRARY_NAME})
 
 endfunction()
 
@@ -483,4 +481,3 @@ function(cmaki2_gtest)
 	cmaki_find_package(google-gmock)
 	cmaki2_test(${ARGV})
 endfunction()
-
