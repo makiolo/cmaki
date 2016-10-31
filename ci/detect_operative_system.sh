@@ -42,6 +42,6 @@ elif [ "${OS}" = "Linux" ] ; then
 	OSSTR="${OS}_${DIST}_${REV}${PSUEDONAME}${MACH}"
 fi
 
-# echo $OSSTR
-echo Linux_Ubuntu_trusty_x86_64
+echo $OSSTR
+# echo Linux_Ubuntu_trusty_x86_64
 
