@@ -18,9 +18,9 @@ ENDIF()
 # MESSAGE("ARTIFACTS_PATH = ${ARTIFACTS_PATH}")
 # MESSAGE("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
 # MESSAGE("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+# MESSAGE(FATAL_ERROR)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set(PACKAGE_BASE_URL "http://localhost/artifacts")
 
 IF(WIN32)
 	if(MSVC12)
@@ -64,8 +64,8 @@ ENDIF()
 
 function(cmaki_find_package PACKAGE)
 
-	IF(NOT DEFINED PACKAGE_BASE_URL)
-		MESSAGE(FATAL_ERROR "PACKAGE_BASE_URL: is not defined")
+	IF(NOT DEFINED CMAKI_REPOSITORY)
+		MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
 	ENDIF()
 
 	# get version now
@@ -84,7 +84,7 @@ function(cmaki_find_package PACKAGE)
 	#######################################################
 	# get version in local cache or remote artifacts server
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION}
+		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(RESULT_VERSION)
@@ -114,7 +114,7 @@ function(cmaki_find_package PACKAGE)
 		# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
 		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
 		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
-		set(http_package_cmake_filename ${PACKAGE_BASE_URL}/download.php?file=${package_cmake_filename})
+		set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
 		cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
 		# Si no puede descargar el artefacto (es posible no tener la version definida)
 		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE_GENERATE_ARTIFACT})
@@ -139,7 +139,7 @@ function(cmaki_find_package PACKAGE)
 			# llamar a check_remote_version
 			# dando el nombre recibo la version
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${PACKAGE_BASE_URL} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
+				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 			#MESSAGE("RESULT_VERSION2 = ${RESULT_VERSION}")
@@ -154,7 +154,7 @@ function(cmaki_find_package PACKAGE)
 			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
 			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${PACKAGE_BASE_URL}/upload.php --filename=${package_generated_file}
+				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE upload_result1
 				)
@@ -162,7 +162,7 @@ function(cmaki_find_package PACKAGE)
 				message(FATAL_ERROR "error in upload ${package_generated_file})")
 			endif()
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${PACKAGE_BASE_URL}/upload.php --filename=${package_cmake_generated_file}
+				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE upload_result2
 				)
@@ -298,14 +298,14 @@ endfunction()
 
 macro(cmaki_download_package)
 	# Base URL for packages.
-	IF(NOT DEFINED PACKAGE_BASE_URL)
-		MESSAGE(FATAL_ERROR "PACKAGE_BASE_URL: is not defined")
+	IF(NOT DEFINED CMAKI_REPOSITORY)
+		MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
 	ENDIF()
 	get_filename_component(package_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 	# ${package_name} en realidad es paquete + version
 	get_filename_component(package_name "${package_dir}" NAME)
 	set(package_cmake_filename ${package_name}-${CMAKI_PLATFORM}.tar.gz)
-	set(http_package_cmake_filename ${PACKAGE_BASE_URL}/download.php?file=${package_cmake_filename})
+	set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
 
 	# URL implicita
 	# strip implicito
