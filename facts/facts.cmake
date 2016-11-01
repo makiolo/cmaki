@@ -119,22 +119,38 @@ function(cmaki_find_package PACKAGE)
 		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
 		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE_GENERATE_ARTIFACT})
 
-			file(REMOVE "${depends_bin_package}")
-			file(REMOVE "${depends_package}")
-			file(REMOVE "${package_uncompressed_file}")
+			file(REMOVE_RECURSE "${depends_bin_package}")
+			file(REMOVE_RECURSE "${depends_package}")
+			file(REMOVE_RECURSE "${package_uncompressed_file}")
 
 			# 5. compilo y genera el paquete en local
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o -d
+				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} -o
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
 			if(artifacts_result)
 				message(FATAL_ERROR "can't create artifact ${PACKAGE}")
+				file(REMOVE_RECURSE "${depends_bin_package}")
+				file(REMOVE_RECURSE "${depends_package}")
+				file(REMOVE_RECURSE "${package_uncompressed_file}")
+			endif()
+
+			# 6. descomprimo el artefacto
+			execute_process(
+				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
+				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
+				RESULT_VARIABLE uncompress_result
+				)
+			if(uncompress_result)
+				message(FATAL_ERROR "Extracting ${package_cmake_generated_file} failed! Error ${uncompress_result}")
+				file(REMOVE_RECURSE "${depends_bin_package}")
+				file(REMOVE_RECURSE "${depends_package}")
+				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
 
 			#######################################################
-			# 6: obtengo la version del paquete recien creado
+			# 7: obtengo la version del paquete recien creado
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -144,11 +160,12 @@ function(cmaki_find_package PACKAGE)
 			list(GET RESULT_VERSION 2 VERSION)
 			#######################################################
 
-			# 7. subo el artefacto y los ficheros de cmake
+			# 8. subo el artefacto y los ficheros de cmake
 			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}.tar.gz)
 			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
 			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
 			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
+			message("-- uploading ${package_generated_file}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -156,7 +173,11 @@ function(cmaki_find_package PACKAGE)
 				)
 			if(upload_result1)
 				message(FATAL_ERROR "error in upload ${package_generated_file})")
+				file(REMOVE_RECURSE "${depends_bin_package}")
+				file(REMOVE_RECURSE "${depends_package}")
+				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
+			message("-- uploading ${package_cmake_generated_file}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -164,18 +185,11 @@ function(cmaki_find_package PACKAGE)
 				)
 			if(upload_result2)
 				message(FATAL_ERROR "error in upload ${package_cmake_generated_file})")
+				file(REMOVE_RECURSE "${depends_bin_package}")
+				file(REMOVE_RECURSE "${depends_package}")
+				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
 
-			# 8. descomprimo el artefacto
-			execute_process(
-				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
-				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
-				RESULT_VARIABLE uncompress_result
-				)
-			if(uncompress_result)
-				message(FATAL_ERROR "Extracting ${package_cmake_generated_file} failed! Error ${uncompress_result}")
-			endif()
-			
 			# 9. borro los 2 tar gz
 			file(REMOVE "${package_generated_file}")
 			file(REMOVE "${package_cmake_generated_file}")
