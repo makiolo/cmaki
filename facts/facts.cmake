@@ -45,7 +45,7 @@ ELSE()
 	get_filename_component(compiler ${CMAKE_CXX_COMPILER} NAME)
 	SET(CMAKI_COMPILER "${compiler}")
 ENDIF()
-# MESSAGE("-- compiler detected: ${CMAKI_COMPILER}")
+MESSAGE("-- compiler detected: ${CMAKI_COMPILER}")
 
 IF(WIN32)
 	if(CMAKE_CL_64)
@@ -60,7 +60,7 @@ ELSE()
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
 ENDIF()
-# MESSAGE("-- platform detected: ${CMAKI_PLATFORM}")
+MESSAGE("-- platform detected: ${CMAKI_PLATFORM}")
 
 function(cmaki_find_package PACKAGE)
 
@@ -487,6 +487,7 @@ function(cmaki2_test)
 		NAME ${_TEST_NAME}_exe
 		COMMAND ${_TEST_NAME}_exe
 		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	generate_vcxproj_user(${_TEST_NAME})
 
 endfunction()
 
