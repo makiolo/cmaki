@@ -10,9 +10,7 @@ option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only c
 macro(cmaki_setup)
 	enable_modern_cpp()
 	enable_testing()
-	if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-		set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-	endif()
+	set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 endmacro()
 
 macro (mark_as_internal _var)
