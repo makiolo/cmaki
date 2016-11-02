@@ -1,7 +1,6 @@
 if(NOT DEFINED CMAKE_MODULE_PATH)
 	set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 endif()
-
 include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
@@ -9,12 +8,11 @@ option(COVERAGE "active coverage (only clang)" FALSE)
 option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "")
 
 macro(cmaki_setup)
-
 	enable_modern_cpp()
 	enable_testing()
-	# default install prefix
-	set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-
+	if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+		set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+	endif()
 endmacro()
 
 macro(GENERATE_CLANG)
@@ -153,7 +151,10 @@ macro(cmaki_parse_parameters)
 		elseif(PARM STREQUAL PCH)
 			set(NOW_IN PCH)
 		elseif(PARM STREQUAL PTHREADS)
-			SET(HAVE_PTHREADS TRUE)
+			if(NOT WIN32)
+				# no enabled in windows
+				set(HAVE_PTHREADS TRUE)
+			endif()
 		elseif(PARM STREQUAL INCLUDES)
 			set(NOW_IN INCLUDES)
 		else()
@@ -323,10 +324,6 @@ macro(common_flags)
 			add_definitions(-Zm200)
 		endif()
 	endif()
-
-	# include_directories(BEFORE ${TOOLCHAIN_ROOT}/include)
-	# link_directories(${TOOLCHAIN_ROOT}/lib)
-	# SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ltcmalloc")
 endmacro()
 
 macro(enable_modern_cpp)
@@ -467,18 +464,17 @@ macro(generate_vcxproj_user _EXECUTABLE_NAME)
 	ENDIF()
 endmacro()
 
-function(DUNE_EXECUTABLE _EXECUTABLE_NAME _SOURCE_FILES)
+######################## TODO: DEPRECATED REMOVE!
 
+function(DUNE_EXECUTABLE _EXECUTABLE_NAME _SOURCE_FILES)
 	source_group( "Source Files" FILES ${_SOURCE_FILES} )
 	include_directories(..)
 	include_directories(h)
 	ADD_EXECUTABLE(${_EXECUTABLE_NAME} ${_SOURCE_FILES})
 	generate_vcxproj_user(${_EXECUTABLE_NAME})
-
 endfunction()
 
 function(DUNE_LIBRARY)
-
 	set(PARAMETERS ${ARGV})
 	list(GET PARAMETERS 0 LIBNAME)
 	list(REMOVE_AT PARAMETERS 0)
@@ -574,41 +570,8 @@ function(DUNE_LIBRARY)
 			DESTINATION ${BUILD_TYPE}
 			CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-
 endfunction()
 
 function(GENERATE_LIB)
-
 	DUNE_LIBRARY(${ARGSN})
-
 endfunction()
-
-macro(common_flags_deprecated)
-	if(SANITIZER)
-		add_definitions(-g3)
-		# "address-full" "memory" "thread"
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZER}")
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER}")
-		add_definitions(-fsanitize=${SANITIZER})
-	endif()
-	IF(COVERAGE)
-		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
-		else()
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs")
-			SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -lgcov")
-		endif()
-	endif()
-
-	if(NOT WIN32)
-		SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pthread" )
-		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lpthread" )
-		endif()
-	endif()
-
-	# include_directories(BEFORE ${TOOLCHAIN_ROOT}/include)
-	# link_directories(${TOOLCHAIN_ROOT}/lib)
-	# SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ltcmalloc")
-endmacro()
-
