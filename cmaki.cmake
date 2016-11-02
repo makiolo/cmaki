@@ -15,49 +15,6 @@ macro(cmaki_setup)
 	endif()
 endmacro()
 
-macro(GENERATE_CLANG)
-	# Generate .clang_complete for full completation in vim + clang_complete
-	set(extra_parameters "")
-	get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-	foreach(dir ${dirs})
-	  set(extra_parameters ${extra_parameters} -I${dir})
-	endforeach()
-	get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS)
-	foreach(dir ${dirs})
-	  set(extra_parameters ${extra_parameters} -D${dir})
-	endforeach()
-	STRING(REGEX REPLACE ";" "\n" extra_parameters "${extra_parameters}")
-	FILE(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/.clang_complete" "${extra_parameters}\n")
-endmacro()
-
-macro(generate_vcxproj_user _EXECUTABLE_NAME)
-    IF(MSVC)
-        set(project_vcxproj_user "${CMAKE_CURRENT_BINARY_DIR}/${_EXECUTABLE_NAME}.vcxproj.user")
-        if (NOT EXISTS ${project_vcxproj_user})
-            FILE(WRITE "${project_vcxproj_user}"
-            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-            "<Project ToolsVersion=\"12.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
-            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
-            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-            "</PropertyGroup>\n"
-            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'\">\n"
-            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-            "</PropertyGroup>\n"
-            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">\n"
-            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-            "</PropertyGroup>\n"
-            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='MinSizeRel|x64'\">\n"
-            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-            "</PropertyGroup>\n"
-            "</Project>\n")
-        endif()
-    ENDIF()
-endmacro()
-
 macro (mark_as_internal _var)
     set(${_var} ${${_var}} CACHE INTERNAL "hide this!" FORCE)
 endmacro(mark_as_internal _var)
@@ -205,7 +162,7 @@ function(cmaki_executable)
 					DESTINATION ${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-	generate_vcxproj_user(${_EXECUTABLE_NAME})
+	generate_clang()
 
 endfunction()
 
@@ -232,7 +189,7 @@ function(cmaki_library)
 					DESTINATION ${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-	generate_vcxproj_user(${_LIBRARY_NAME})
+	generate_clang()
 
 endfunction()
 
@@ -268,6 +225,8 @@ function(cmaki_test)
 			NAME ${_TEST_NAME}__
 			COMMAND ${_TEST_NAME})
 	ENDIF()
+	generate_vcxproj_user(${_TEST_NAME})
+	generate_clang()
 
 endfunction()
 
@@ -280,6 +239,7 @@ macro(common_flags)
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER}")
 		add_definitions(-fsanitize=${SANITIZER})
 	endif()
+	
 	IF(COVERAGE)
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
@@ -289,51 +249,34 @@ macro(common_flags)
 		endif()
 	endif()
 
-	if(NOT WIN32)
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lpthread" )
-		endif()
-		add_compile_options(-pthread)
+	if(WIN32 AND (NOT MINGW) AND (NOT MSYS))
+		# c++ exceptions and RTTI
+		# add_definitions(/D_HAS_EXCEPTIONS=0)
+		# add_definitions(/GR-)
+		add_definitions(/wd4251)
+		add_definitions(/wd4275)
+		# Avoid warning as error with / WX / W4
+		# conversion from 'std::reference_wrapper<Chunk>' to 'std::reference_wrapper<Chunk> &
+		add_definitions(/wd4239)
+		# warning C4316: 'PhysicsManager' : object allocated on the heap may not be aligned 16
+		add_definitions(/wd4316)
+		# conditional expression is constant
+		add_definitions(/wd4127)
+		# conversion from 'int' to 'unsigned int', signed/unsigned mismatch
+		add_definitions(/wd4245)
+		# declaration of 'next' hides class membe
+		add_definitions(/wd4458)
 
-		# if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		# 	# enable OpenMP (need gomp dev)
-		# 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fopenmp")
-		# 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -lgomp -lrt")
-		# endif()
-	else()
-		if(NOT MINGW AND NOT MSYS)
-			# c++ exceptions and RTTI
-			#add_definitions(/D_HAS_EXCEPTIONS=0)
-			#add_definitions(/GR-)
-			add_definitions(/wd4251)
-			add_definitions(/wd4275)
-			# Avoid warning as error with / WX / W4
-			# conversion from 'std::reference_wrapper<Chunk>' to 'std::reference_wrapper<Chunk> &
-			add_definitions(/wd4239)
-			# warning C4316: 'PhysicsManager' : object allocated on the heap may not be aligned 16
-			add_definitions(/wd4316)
-			# conditional expression is constant
-			add_definitions(/wd4127)
-			# conversion from 'int' to 'unsigned int', signed/unsigned mismatch
-			add_definitions(/wd4245)
-			# declaration of 'next' hides class membe
-			add_definitions(/wd4458)
-
-			add_definitions(/WX /W4)
-			add_definitions(-Zm200)
-		endif()
+		add_definitions(/WX /W4)
+		add_definitions(-Zm200)
 	endif()
+
 endmacro()
 
 macro(enable_modern_cpp)
 
-	if(WIN32)
-		if(NOT MINGW AND NOT MSYS)
-			add_definitions(/EHsc)
-			#add_definitions(/GR-)
-			#add_definitions(/D_HAS_EXCEPTIONS=0)
-		endif()
+	if(WIN32 AND (NOT MINGW) AND (NOT MSYS))
+		add_definitions(/EHsc)
 	else()
 		# add_definitions(-fno-rtti -fno-exceptions )
 		# activate all warnings and convert in errors
@@ -436,142 +379,46 @@ macro(enable_modern_cpp)
 	SET(CMAKE_BUILD_TYPE_INIT Release)
 endmacro()
 
+# TODO: only works in win64 ?
 macro(generate_vcxproj_user _EXECUTABLE_NAME)
-	IF(MSVC)
-		set(project_vcxproj_user "${CMAKE_CURRENT_BINARY_DIR}/${_EXECUTABLE_NAME}.vcxproj.user")
-		if (NOT EXISTS ${project_vcxproj_user})
-			FILE(WRITE "${project_vcxproj_user}"
-				"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-				"<Project ToolsVersion=\"12.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
-				"<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
-				"<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-				"<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-				"</PropertyGroup>\n"
-				"<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'\">\n"
-				"<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-				"<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-				"</PropertyGroup>\n"
-				"<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">\n"
-				"<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-				"<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-				"</PropertyGroup>\n"
-				"<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='MinSizeRel|x64'\">\n"
-				"<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
-				"<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
-				"</PropertyGroup>\n"
-				"</Project>\n")
-		endif()
-	ENDIF()
+    IF(MSVC)
+        set(project_vcxproj_user "${CMAKE_CURRENT_BINARY_DIR}/${_EXECUTABLE_NAME}.vcxproj.user")
+        if (NOT EXISTS ${project_vcxproj_user})
+            FILE(WRITE "${project_vcxproj_user}"
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+            "<Project ToolsVersion=\"12.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
+            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
+            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
+            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
+            "</PropertyGroup>\n"
+            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'\">\n"
+            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
+            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
+            "</PropertyGroup>\n"
+            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">\n"
+            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
+            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
+            "</PropertyGroup>\n"
+            "<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='MinSizeRel|x64'\">\n"
+            "<LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>\n"
+            "<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
+            "</PropertyGroup>\n"
+            "</Project>\n")
+        endif()
+    ENDIF()
 endmacro()
 
-######################## TODO: DEPRECATED REMOVE!
-
-function(DUNE_EXECUTABLE _EXECUTABLE_NAME _SOURCE_FILES)
-	source_group( "Source Files" FILES ${_SOURCE_FILES} )
-	include_directories(..)
-	include_directories(h)
-	ADD_EXECUTABLE(${_EXECUTABLE_NAME} ${_SOURCE_FILES})
-	generate_vcxproj_user(${_EXECUTABLE_NAME})
-endfunction()
-
-function(DUNE_LIBRARY)
-	set(PARAMETERS ${ARGV})
-	list(GET PARAMETERS 0 LIBNAME)
-	list(REMOVE_AT PARAMETERS 0)
-
-	SET(HAVE_TESTS FALSE)
-	SET(HAVE_PCH FALSE)
-	set(TARGET_DEPENDENCIES)
-	set(EXTRA_SOURCES)
-	set(TESTS_SOURCES)
-	set(PCH_SOURCE)
-	while(PARAMETERS)
-		list(GET PARAMETERS 0 PARM)
-		if(PARM STREQUAL DEPENDENCIES)
-			set(NOW_IN DEPENDENCIES)
-		elseif(PARM STREQUAL EXTRA_SOURCES)
-			set(NOW_IN EXTRA_SOURCES)
-		elseif(PARM STREQUAL TESTS)
-			set(NOW_IN TESTS)
-		elseif(PARM STREQUAL PCH)
-			set(NOW_IN PCH)
-		else()
-			if(NOW_IN STREQUAL DEPENDENCIES)
-				set(TARGET_DEPENDENCIES ${TARGET_DEPENDENCIES} ${PARM})
-			elseif(NOW_IN STREQUAL EXTRA_SOURCES)
-				set(EXTRA_SOURCES ${EXTRA_SOURCES} ${PARM})
-			elseif(NOW_IN STREQUAL TESTS)
-				set(TESTS_SOURCES ${TESTS_SOURCES} ${PARM})
-				SET(HAVE_TESTS TRUE)
-			elseif(NOW_IN STREQUAL PCH)
-				set(PCH_SOURCE ${PARM})
-				SET(HAVE_PCH TRUE)
-			else()
-				message(FATAL_ERROR "Unknown argument ${PARM}.")
-			endif()
-		endif()
-		list(REMOVE_AT PARAMETERS 0)
-	endwhile()
-
-	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
-		include_directories(${INCLUDE_DIR})
+macro(generate_clang)
+	# Generate .clang_complete for full completation in vim + clang_complete
+	set(extra_parameters "")
+	get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+	foreach(dir ${dirs})
+	  set(extra_parameters ${extra_parameters} -I${dir})
 	endforeach()
-	INCLUDE_DIRECTORIES(..)
-	INCLUDE_DIRECTORIES(h)
-
-	file( GLOB SOURCE_FILES [Cc]/*.c [Cc]/*.cpp [Cc]/*.cxx *.cpp *.c *.cxx )
-	file( GLOB HEADERS_FILES [Hh]/*.h [Hh]/*.hpp [Hh]/*.hxx [Hh][Pp][Pp]/*.hpp [Hh][Pp][Pp]/*.hxx *.h *.hpp *.hxx )
-	IF(WIN32)
-		file( GLOB SPECIFIC_PLATFORM c/win32/*.cpp )
-		INCLUDE_DIRECTORIES(c/win32)
-	ELSEIF(UNIX)
-		file( GLOB SPECIFIC_PLATFORM c/linux/*.cpp )
-		INCLUDE_DIRECTORIES(c/linux)
-	ELSEIF(MAC)
-		file( GLOB SPECIFIC_PLATFORM c/mac/*.cpp )
-		INCLUDE_DIRECTORIES(c/mac)
-	ELSEIF(ANDROID)
-		file( GLOB SPECIFIC_PLATFORM c/android/*.cpp )
-		INCLUDE_DIRECTORIES(c/android)
-	ENDIF()
-
-	SET(SOURCE_FILES ${SOURCE_FILES} "${SPECIFIC_PLATFORM}")
-	source_group( "c" FILES ${SOURCE_FILES})
-	source_group( "h" FILES ${HEADERS_FILES})
-
-	common_flags()
-	ADD_LIBRARY(${LIBNAME} SHARED ${SOURCE_FILES} ${HEADERS_FILES} ${EXTRA_SOURCES})
-	TARGET_LINK_LIBRARIES(${LIBNAME} ${TARGET_DEPENDENCIES})
-	foreach(LIB_DIR ${CMAKI_LIBRARIES})
-		target_link_libraries(${LIBNAME} ${LIB_DIR})
-		cmaki_install_3rdparty(${LIB_DIR})
+	get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY COMPILE_DEFINITIONS)
+	foreach(dir ${dirs})
+	  set(extra_parameters ${extra_parameters} -D${dir})
 	endforeach()
-
-	IF(WIN32)
-		# library with suffix python friendly
-		set_target_properties(${LIBNAME} PROPERTIES SUFFIX .pyd)
-	ENDIF()
-
-	if(HAVE_PCH)
-
-		# TODO: problems clang
-		# if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		# 	include(${CMAKE_CURRENT_LIST_DIR}/cmaki/ci/cotire.cmake)
-		# 	set_target_properties(${LIBNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "h/${PCH_SOURCE}")
-		# 	set_target_properties(${LIBNAME} PROPERTIES COTIRE_UNITY_LINK_LIBRARIES_INIT "COPY")
-		# 	cotire(${LIBNAME})
-		# endif()
-	endif()
-
-	GENERATE_CLANG()
-
-	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-		INSTALL(TARGETS ${LIBNAME}
-			DESTINATION ${BUILD_TYPE}
-			CONFIGURATIONS ${BUILD_TYPE})
-	endforeach()
-endfunction()
-
-function(GENERATE_LIB)
-	DUNE_LIBRARY(${ARGSN})
-endfunction()
+	STRING(REGEX REPLACE ";" "\n" extra_parameters "${extra_parameters}")
+	FILE(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/.clang_complete" "${extra_parameters}\n")
+endmacro()
