@@ -253,18 +253,11 @@ macro(common_flags)
 		# add_definitions(/GR-)
 		add_definitions(/wd4251)
 		add_definitions(/wd4275)
-		# Avoid warning as error with / WX / W4
-		# conversion from 'std::reference_wrapper<Chunk>' to 'std::reference_wrapper<Chunk> &
 		add_definitions(/wd4239)
-		# warning C4316: 'PhysicsManager' : object allocated on the heap may not be aligned 16
 		add_definitions(/wd4316)
-		# conditional expression is constant
 		add_definitions(/wd4127)
-		# conversion from 'int' to 'unsigned int', signed/unsigned mismatch
 		add_definitions(/wd4245)
-		# declaration of 'next' hides class membe
 		add_definitions(/wd4458)
-
 		add_definitions(/WX /W4)
 		add_definitions(-Zm200)
 	endif()
@@ -282,7 +275,7 @@ macro(enable_modern_cpp)
 		# borro pedantic, en dune falla
 		# add_definitions(-pedantic -pedantic-errors)
 		add_definitions(-Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion)
-		add_definitions(-Wdisabled-optimization -Werror -Wfloat-equal -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k)
+		add_definitions(-Wdisabled-optimization -Werror -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k)
 		add_definitions(-Wimport  -Winit-self  -Winline -Winvalid-pch -Wlong-long -Wmissing-field-initializers -Wmissing-format-attribute)
 		add_definitions(-Wpointer-arith -Wredundant-decls -Wshadow)
 		add_definitions(-Wstack-protector -Wunreachable-code -Wunused)
@@ -292,7 +285,6 @@ macro(enable_modern_cpp)
 		# convert error in warnings
 		add_definitions(-Wno-error=shadow)
 		add_definitions(-Wno-error=long-long)
-		add_definitions(-Wno-error=aggregate-return)
 		add_definitions(-Wno-error=aggregate-return)
 		add_definitions(-Wno-error=unused-variable)
 		add_definitions(-Wno-error=unused-parameter)
@@ -328,13 +320,11 @@ macro(enable_modern_cpp)
 			add_definitions(-Wno-strict-aliasing)
 			add_definitions(-Wno-error=inline)
 			add_definitions(-Wno-error=maybe-uninitialized)
-			add_definitions(-Wno-error=float-conversion)
 		else()
 			add_definitions(-Wstrict-aliasing=2)
 			add_definitions(-Wno-error=format-nonliteral)
 			add_definitions(-Wno-error=cast-align)
 			add_definitions(-Wno-error=deprecated-register)
-			# poner override en metacommon y borrar
 			add_definitions(-Wno-error=inconsistent-missing-override)
 			add_definitions(-Wno-error=mismatched-tags)
 			add_definitions(-Wno-error=overloaded-virtual)
