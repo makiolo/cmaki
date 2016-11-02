@@ -92,7 +92,6 @@ function(cmaki_find_package PACKAGE)
 		list(GET RESULT_VERSION 1 PACKAGE_NAME)
 		list(GET RESULT_VERSION 2 VERSION)
 		set(FORCE_GENERATE_ARTIFACT FALSE)
-		message("-- cached package ${PACKAGE_NAME} (${VERSION})")
 	else()
 		set(VERSION ${VERSION_REQUEST})
 		set(FORCE_GENERATE_ARTIFACT TRUE)
@@ -136,7 +135,26 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
 
-			# 6. descomprimo el artefacto
+			#######################################################
+			# 6: obtengo la version del paquete recien creado
+			message("python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}")
+			execute_process(
+				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
+				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+			list(GET RESULT_VERSION 0 PACKAGE_MODE)
+			list(GET RESULT_VERSION 1 PACKAGE_NAME)
+			list(GET RESULT_VERSION 2 VERSION)
+			#######################################################
+
+			# 7. subo el artefacto y los ficheros de cmake
+			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}.tar.gz)
+			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
+			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
+			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
+
+			# 8. descomprimo el artefacto
+			message("${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}")
 			execute_process(
 				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
 				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
@@ -149,23 +167,9 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
 
-			#######################################################
-			# 7: obtengo la version del paquete recien creado
-			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
-				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-			list(GET RESULT_VERSION 0 PACKAGE_MODE)
-			list(GET RESULT_VERSION 1 PACKAGE_NAME)
-			list(GET RESULT_VERSION 2 VERSION)
-			#######################################################
-
-			# 8. subo el artefacto y los ficheros de cmake
-			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}.tar.gz)
-			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
-			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
-			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
+			# 9. subir artefactos
 			message("-- uploading ${package_generated_file}")
+			message("python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -178,6 +182,7 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
 			message("-- uploading ${package_cmake_generated_file}")
+			message("python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -190,7 +195,7 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
 			endif()
 
-			# 9. borro los 2 tar gz
+			# 10. borro los 2 tar gz
 			file(REMOVE "${package_generated_file}")
 			file(REMOVE "${package_cmake_generated_file}")
 
