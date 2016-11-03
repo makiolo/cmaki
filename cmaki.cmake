@@ -272,7 +272,6 @@ macro(enable_modern_cpp)
 		# add_definitions(-fno-rtti -fno-exceptions )
 		# activate all warnings and convert in errors
 		# add_definitions(-Weffc++)
-		# borro pedantic, en dune falla
 		# add_definitions(-pedantic -pedantic-errors)
 		add_definitions(-Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion)
 		add_definitions(-Wdisabled-optimization -Werror -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k)
@@ -410,3 +409,4 @@ macro(generate_clang)
 	STRING(REGEX REPLACE ";" "\n" extra_parameters "${extra_parameters}")
 	FILE(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/.clang_complete" "${extra_parameters}\n")
 endmacro()
+
