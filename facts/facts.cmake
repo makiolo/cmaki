@@ -23,7 +23,13 @@ if(DEFINED CMAKI_DEBUG)
 endif()
 
 IF(WIN32)
-	if(MSVC12)
+	if(MSVC14)
+		set(MSVC_NAME_LOWER "vc140")
+		set(MSVC_NAME_UPPER "VC140")
+	elseif(MSVC13)
+		set(MSVC_NAME_LOWER "vc130")
+		set(MSVC_NAME_UPPER "VC130")
+	elseif(MSVC12)
 		set(MSVC_NAME_LOWER "vc120")
 		set(MSVC_NAME_UPPER "VC120")
 	elseif(MSVC11)
@@ -240,7 +246,7 @@ function(cmaki_find_package PACKAGE)
 	foreach(INCLUDE_DIR ${${PACKAGE_UPPER}_INCLUDE_DIRS})
 		list(APPEND CMAKI_INCLUDE_DIRS "${INCLUDE_DIR}")
 	endforeach()
-	
+
 	# 14. añadir los libdir
 	foreach(LIB_DIR ${${PACKAGE_UPPER}_LIBRARIES})
 		list(APPEND CMAKI_LIBRARIES "${LIB_DIR}")

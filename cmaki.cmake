@@ -237,7 +237,7 @@ macro(common_flags)
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER}")
 		add_definitions(-fsanitize=${SANITIZER})
 	endif()
-	
+
 	IF(COVERAGE)
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
