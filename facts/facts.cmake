@@ -45,7 +45,6 @@ ELSE()
 	get_filename_component(compiler ${CMAKE_CXX_COMPILER} NAME)
 	SET(CMAKI_COMPILER "${compiler}")
 ENDIF()
-MESSAGE("-- compiler detected: ${CMAKI_COMPILER}")
 
 IF(WIN32)
 	if(CMAKE_CL_64)
@@ -60,7 +59,6 @@ ELSE()
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
 ENDIF()
-MESSAGE("-- platform detected: ${CMAKI_PLATFORM}")
 
 function(cmaki_find_package PACKAGE)
 
@@ -199,7 +197,7 @@ function(cmaki_find_package PACKAGE)
 			file(REMOVE "${package_generated_file}")
 			file(REMOVE "${package_cmake_generated_file}")
 
-		# me lo he descargdo y existe
+		# me lo he descargdo y solo es descomprimirlo
 		elseif(EXISTS "${package_uncompressed_file}")
 
 			# 10. lo descomprimo cacheado
@@ -240,7 +238,7 @@ function(cmaki_find_package PACKAGE)
 	foreach(INCLUDE_DIR ${${PACKAGE_UPPER}_INCLUDE_DIRS})
 		list(APPEND CMAKI_INCLUDE_DIRS "${INCLUDE_DIR}")
 	endforeach()
-	
+
 	# 14. añadir los libdir
 	foreach(LIB_DIR ${${PACKAGE_UPPER}_LIBRARIES})
 		list(APPEND CMAKI_LIBRARIES "${LIB_DIR}")
