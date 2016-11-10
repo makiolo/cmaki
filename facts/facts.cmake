@@ -309,7 +309,6 @@ endfunction()
 
 function(cmaki_download_file THE_URL INTO_FILE)
 	set(COPY_SUCCESFUL FALSE PARENT_SCOPE)
-	MESSAGE("Download from ${THE_URL} to ${INTO_FILE}")
 	file(DOWNLOAD ${THE_URL} ${INTO_FILE} STATUS RET)
 	list(GET RET 0 RET_CODE)
 	if(RET_CODE EQUAL 0)
