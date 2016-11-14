@@ -97,6 +97,7 @@ function(cmaki_find_package PACKAGE)
 		list(GET RESULT_VERSION 2 VERSION)
 		set(FORCE_GENERATE_ARTIFACT FALSE)
 	else()
+		set(PACKAGE_MODE "EXACT")
 		set(VERSION ${VERSION_REQUEST})
 		set(FORCE_GENERATE_ARTIFACT TRUE)
 		message("-- need build package ${PACKAGE_NAME} can't get version: ${VERSION_REQUEST}, will be generated.")
@@ -104,7 +105,8 @@ function(cmaki_find_package PACKAGE)
 	#######################################################
 
 	# 3. si no tengo los ficheros de cmake, los intento descargar
-	set(depends_bin_package "${CMAKI_PATH}/../depends/${PACKAGE}-${VERSION}")
+	set(depends_dir "${CMAKI_PATH}/../depends")
+	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package ${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION})
 	if((NOT EXISTS "${depends_package}") OR ${FORCE_GENERATE_ARTIFACT})
 		# pido un paquete, en funcion de:
@@ -146,9 +148,14 @@ function(cmaki_find_package PACKAGE)
 				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-			list(GET RESULT_VERSION 0 PACKAGE_MODE)
-			list(GET RESULT_VERSION 1 PACKAGE_NAME)
-			list(GET RESULT_VERSION 2 VERSION)
+			if(RESULT_VERSION)
+				list(GET RESULT_VERSION 0 PACKAGE_MODE)
+				list(GET RESULT_VERSION 1 PACKAGE_NAME)
+				list(GET RESULT_VERSION 2 VERSION)
+				set(FORCE_GENERATE_ARTIFACT FALSE)
+			else()
+				message(FATAL_ERROR "-- not found ${PACKAGE}.")
+			endif()
 			#######################################################
 
 			# 7. subo el artefacto y los ficheros de cmake
@@ -169,6 +176,21 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE_RECURSE "${depends_bin_package}")
 				file(REMOVE_RECURSE "${depends_package}")
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
+				file(REMOVE_RECURSE "${package_generated_file}")
+			endif()
+
+			# y tambien descomprimo el propio tar gz
+			execute_process(
+				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_generated_file}"
+				WORKING_DIRECTORY "${depends_dir}/"
+				RESULT_VARIABLE uncompress_result2
+				)
+			if(uncompress_result2)
+				message(FATAL_ERROR "Extracting ${package_generated_file} failed! Error ${uncompress_result2}")
+				file(REMOVE_RECURSE "${depends_bin_package}")
+				file(REMOVE_RECURSE "${depends_package}")
+				file(REMOVE_RECURSE "${package_uncompressed_file}")
+				file(REMOVE_RECURSE "${package_generated_file}")
 			endif()
 
 			# 9. subir artefactos
@@ -180,10 +202,12 @@ function(cmaki_find_package PACKAGE)
 				RESULT_VARIABLE upload_result1
 				)
 			if(upload_result1)
-				message(FATAL_ERROR "error in upload ${package_generated_file})")
+				# upload not is fatal
+				message("error in upload ${package_generated_file})")
 				file(REMOVE_RECURSE "${depends_bin_package}")
 				file(REMOVE_RECURSE "${depends_package}")
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
+				file(REMOVE_RECURSE "${package_generated_file}")
 			endif()
 			message("-- uploading ${package_cmake_generated_file}")
 			message("python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}")
@@ -193,10 +217,12 @@ function(cmaki_find_package PACKAGE)
 				RESULT_VARIABLE upload_result2
 				)
 			if(upload_result2)
-				message(FATAL_ERROR "error in upload ${package_cmake_generated_file})")
+				# upload not is fatal
+				message("error in upload ${package_cmake_generated_file})")
 				file(REMOVE_RECURSE "${depends_bin_package}")
 				file(REMOVE_RECURSE "${depends_package}")
 				file(REMOVE_RECURSE "${package_uncompressed_file}")
+				file(REMOVE_RECURSE "${package_generated_file}")
 			endif()
 
 			# 10. borro los 2 tar gz
