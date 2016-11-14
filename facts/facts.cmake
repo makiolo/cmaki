@@ -95,7 +95,7 @@ function(cmaki_find_package PACKAGE)
 		list(GET RESULT_VERSION 0 PACKAGE_MODE)
 		list(GET RESULT_VERSION 1 PACKAGE_NAME)
 		list(GET RESULT_VERSION 2 VERSION)
-		if(NOT DEFINED FORCE_GENERATE_ARTIFACT)
+		if(NOT DEFINED NOCACHE)
 			set(FORCE_GENERATE_ARTIFACT FALSE)
 		endif()
 	else()
@@ -110,7 +110,8 @@ function(cmaki_find_package PACKAGE)
 	set(depends_dir "${CMAKI_PATH}/../depends")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package ${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION})
-	if((NOT EXISTS "${depends_package}" OR NOT EXISTS "${depends_bin_package}"))
+	# if((NOT EXISTS "${depends_package}" OR NOT EXISTS "${depends_bin_package}"))
+	if(NOT EXISTS "${depends_package}")
 		# pido un paquete, en funcion de:
 		#		- paquete
 		#		- version
@@ -124,7 +125,7 @@ function(cmaki_find_package PACKAGE)
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
 		cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
 		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
-		if((NOT "${COPY_SUCCESFUL}") OR ${FORCE_GENERATE_ARTIFACT})
+		if(NOT "${COPY_SUCCESFUL}" OR ${FORCE_GENERATE_ARTIFACT})
 
 			file(REMOVE_RECURSE "${depends_bin_package}")
 			file(REMOVE_RECURSE "${depends_package}")
