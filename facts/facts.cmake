@@ -528,7 +528,7 @@ function(cmaki2_test)
 	endforeach()
 	add_test(
 		NAME ${_TEST_NAME}_exe
-		COMMAND ${_TEST_NAME}_exe
+		COMMAND ${_TEST_NAME}_exe --gtest_repeat=100 --gtest_break_on_failure --gtest_shuffle
 		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
 	generate_vcxproj_user(${_TEST_NAME})
 
