@@ -1,3 +1,5 @@
+message("using cmaki 1")
+
 if(NOT DEFINED CMAKE_MODULE_PATH)
 	set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 endif()
