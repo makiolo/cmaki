@@ -78,7 +78,7 @@ function(cmaki_find_package PACKAGE)
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(RESULT_VERSION)
-		set(VERSION_REQUEST ${RESULT_VERSION})
+		set(VERSION_REQUEST "${RESULT_VERSION}")
 		set(EXTRA_VERSION "--version=${VERSION_REQUEST}")
 	else()
 		set(VERSION_REQUEST "")
@@ -87,14 +87,14 @@ function(cmaki_find_package PACKAGE)
 
 	# 2.5. define flags
 	if(NOT DEFINED NOCACHE_LOCAL)
-		set(NO_USE_CACHE_LOCAL FALSE)
+		set(NO_USE_CACHE_LOCAL "FALSE")
 	else()
-		set(NO_USE_CACHE_LOCAL ${NOCACHE_LOCAL})
+		set(NO_USE_CACHE_LOCAL "${NOCACHE_LOCAL}")
 	endif()
 	if(NOT DEFINED NOCACHE_REMOTE)
-		set(NO_USE_CACHE_REMOTE FALSE)
+		set(NO_USE_CACHE_REMOTE "FALSE")
 	else()
-		set(NO_USE_CACHE_REMOTE ${NOCACHE_REMOTE})
+		set(NO_USE_CACHE_REMOTE "${NOCACHE_REMOTE}")
 	endif()
 
 	#######################################################
@@ -112,16 +112,15 @@ function(cmaki_find_package PACKAGE)
 		set(VERSION ${VERSION_REQUEST})
 		message("-- need build package ${PACKAGE_NAME} can't get version: ${VERSION_REQUEST}, will be generated.")
 		# avoid remote cache, need build
-		set(NO_USE_CACHE_REMOTE TRUE)
+		set(NO_USE_CACHE_REMOTE "TRUE")
 	endif()
 	#######################################################
 
 	# 3. si no tengo los ficheros de cmake, los intento descargar
 	set(depends_dir "${CMAKI_PATH}/../depends")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
-	set(depends_package ${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION})
-	# if((NOT EXISTS "${depends_package}" OR NOT EXISTS "${depends_bin_package}"))
-	if(NOT EXISTS "${depends_package}" OR ${NO_USE_CACHE_LOCAL})
+	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
+	if(NOT EXISTS "${depends_package}" OR "${NO_USE_CACHE_LOCAL}")
 		# pido un paquete, en funcion de:
 		#		- paquete
 		#		- version
@@ -130,15 +129,15 @@ function(cmaki_find_package PACKAGE)
 		# Recibo el que mejor se adapta a mis especificaciones
 		# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
 		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
-		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
-		set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
+		set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz")
+		set(http_package_cmake_filename "${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename}")
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
-		if(NOT ${NO_USE_CACHE_REMOTE})
+		if(NOT "${NO_USE_CACHE_REMOTE}")
 			cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
 			message("Downloading ${http_package_cmake_filename} ...")
 		endif()
 		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
-		if(NOT "${COPY_SUCCESFUL}" OR ${NO_USE_CACHE_REMOTE})
+		if(NOT "${COPY_SUCCESFUL}" OR "${NO_USE_CACHE_REMOTE}")
 
 			file(REMOVE_RECURSE "${depends_bin_package}")
 			file(REMOVE_RECURSE "${depends_package}")
@@ -265,8 +264,7 @@ function(cmaki_find_package PACKAGE)
 	execute_process(
 		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.json
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-		RESULT_VARIABLE artifacts_result
-		)
+		RESULT_VARIABLE artifacts_result)
 	if(artifacts_result)
 		message(FATAL_ERROR "can't save package version: ${PACKAGE} ${VERSION}")
 	endif()
@@ -391,9 +389,9 @@ macro(cmaki_download_package)
 			# TODO: use md5sum
 			# cmaki_download_file("${http_package_cmake_filename}" "${package_compessed}" "${md5sum}" )
 			cmaki_download_file("${http_package_cmake_filename}" "${package_compessed}")
-			if( NOT "${COPY_SUCCESFUL}" )
+			if(NOT "${COPY_SUCCESFUL}")
 				file(REMOVE "${package_compessed}")
-			endif( NOT "${COPY_SUCCESFUL}" )
+			endif()
 		else()
 			MESSAGE("Checksum for ${package_name}-${CMAKI_PLATFORM}.tar.gz not found. Rejecting to download an untrustworthy file.")
 			file(REMOVE_RECURSE "${package_dir}")
