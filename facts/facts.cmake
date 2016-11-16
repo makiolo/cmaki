@@ -85,6 +85,18 @@ function(cmaki_find_package PACKAGE)
 		set(EXTRA_VERSION "")
 	endif()
 
+	# 2.5. define flags
+	if(NOT DEFINED NOCACHE_LOCAL)
+		set(NO_USE_CACHE_LOCAL FALSE)
+	else()
+		set(NO_USE_CACHE_LOCAL ${NOCACHE_LOCAL})
+	endif()
+	if(NOT DEFINED NOCACHE)
+		set(NO_USE_CACHE_REMOTE FALSE)
+	else()
+		set(NO_USE_CACHE_REMOTE ${NOCACHE})
+	endif()
+
 	#######################################################
 	# 2. obtener la mejor version buscando en la cache local y remota
 	execute_process(
@@ -95,18 +107,12 @@ function(cmaki_find_package PACKAGE)
 		list(GET RESULT_VERSION 0 PACKAGE_MODE)
 		list(GET RESULT_VERSION 1 PACKAGE_NAME)
 		list(GET RESULT_VERSION 2 VERSION)
-		if(NOT DEFINED NOCACHE_LOCAL)
-			set(NO_USE_CACHE_LOCAL FALSE)
-		endif()
-		if(NOT DEFINED NOCACHE)
-			set(NO_USE_CACHE_REMOTE FALSE)
-		endif()
 	else()
 		set(PACKAGE_MODE "EXACT")
 		set(VERSION ${VERSION_REQUEST})
-		set(NO_USE_CACHE_LOCAL FALSE)
-		set(NO_USE_CACHE_REMOTE TRUE)
 		message("-- need build package ${PACKAGE_NAME} can't get version: ${VERSION_REQUEST}, will be generated.")
+		# avoid remote cache, need build
+		set(NO_USE_CACHE_REMOTE TRUE)
 	endif()
 	#######################################################
 
@@ -127,6 +133,7 @@ function(cmaki_find_package PACKAGE)
 		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
 		set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
+		# TODO: evitar descarga si NO_USE_CACHE_REMOTE es true
 		cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
 		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
 		if(NOT "${COPY_SUCCESFUL}" OR ${NO_USE_CACHE_REMOTE})
