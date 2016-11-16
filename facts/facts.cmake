@@ -110,7 +110,7 @@ function(cmaki_find_package PACKAGE)
 	else()
 		set(PACKAGE_MODE "EXACT")
 		set(VERSION ${VERSION_REQUEST})
-		message("-- need build package ${PACKAGE_NAME} can't get version: ${VERSION_REQUEST}, will be generated.")
+		message("-- need build package ${PACKAGE} can't get version: ${VERSION_REQUEST}, will be generated.")
 		# avoid remote cache, need build
 		set(NO_USE_CACHE_REMOTE "TRUE")
 	endif()
