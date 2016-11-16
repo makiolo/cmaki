@@ -6,21 +6,31 @@ IF(NOT DEFINED CMAKI_PATH)
 	set(CMAKI_PATH ${CMAKE_MODULE_PATH})
 ENDIF()
 
+IF(NOT DEFINED DEPENDS_PATH)
+	set(DEPENDS_PATH ${CMAKI_PATH}/../depends)
+ENDIF()
+
 IF(NOT DEFINED CMAKE_PREFIX_PATH)
-	set(CMAKE_PREFIX_PATH ${CMAKI_PATH}/../depends/cmakefiles)
+	set(CMAKE_PREFIX_PATH ${DEPENDS_PATH}/cmakefiles)
 ENDIF()
 
 IF(NOT DEFINED ARTIFACTS_PATH)
 	set(ARTIFACTS_PATH ${CMAKI_PATH}/../cmaki_generator)
 ENDIF()
 
-if(DEFINED CMAKI_DEBUG)
-	MESSAGE("CMAKI_PATH = ${CMAKI_PATH}")
-	MESSAGE("ARTIFACTS_PATH = ${ARTIFACTS_PATH}")
-	MESSAGE("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
-	MESSAGE("CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
-	MESSAGE(FATAL_ERROR)
-endif()
+IF(NOT DEFINED DEPENDS_PATHFILE)
+	# rename to ".cmaki.yml" ?
+	set(DEPENDS_PATHFILE ${CMAKI_PATH}/../depends.json)
+ENDIF()
+
+# if(DEFINED CMAKI_DEBUG)
+MESSAGE("CMAKI_PATH = ${CMAKI_PATH}")
+MESSAGE("DEPENDS_PATH = ${DEPENDS_PATH}")
+MESSAGE("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
+MESSAGE("ARTIFACTS_PATH = ${ARTIFACTS_PATH}")
+MESSAGE("DEPENDS_PATHFILE = ${DEPENDS_PATHFILE}")
+# MESSAGE(FATAL_ERROR)
+# endif()
 
 IF(WIN32)
 	if(MSVC14)
@@ -74,7 +84,7 @@ function(cmaki_find_package PACKAGE)
 
 	# 1. obtener la version actual (o ninguno en caso de no tener el artefacto)
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${CMAKI_PATH}/../depends.json
+		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${DEPENDS_PATHFILE}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(RESULT_VERSION)
@@ -117,7 +127,7 @@ function(cmaki_find_package PACKAGE)
 	#######################################################
 
 	# 3. si no tengo los ficheros de cmake, los intento descargar
-	set(depends_dir "${CMAKI_PATH}/../depends")
+	set(depends_dir "${DEPENDS_PATH}")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
 	if(NOT EXISTS "${depends_package}" OR "${NO_USE_CACHE_LOCAL}")
@@ -146,7 +156,7 @@ function(cmaki_find_package PACKAGE)
 			# 5. compilo y genera el paquete en local
 			message("Generating artifact ${PACKAGE} ...")
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${CMAKI_PATH}/../depends.json --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH}
+				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
@@ -208,7 +218,6 @@ function(cmaki_find_package PACKAGE)
 
 			# 9. subir artefactos
 			message("-- uploading ${package_generated_file}")
-			message("python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -223,7 +232,6 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE "${package_generated_file}")
 			endif()
 			message("-- uploading ${package_cmake_generated_file}")
-			message("python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -259,7 +267,7 @@ function(cmaki_find_package PACKAGE)
 
 	# 11. Guardar nuestra version en uso
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${CMAKI_PATH}/../depends.json
+		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${DEPENDS_PATHFILE}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		RESULT_VARIABLE artifacts_result)
 	if(artifacts_result)
@@ -368,7 +376,7 @@ macro(cmaki_download_package)
 	# URL implicita
 	# strip implicito
 
-	set(depends_dir "${CMAKI_PATH}/../depends")
+	set(depends_dir "${DEPENDS_PATH}")
 	get_filename_component(depends_dir "${depends_dir}" ABSOLUTE)
 	set(package_compessed "${depends_dir}/${package_name}.tar.gz")
 	set(package_uncompressed_dir "${depends_dir}/${package_name}.tmp")
