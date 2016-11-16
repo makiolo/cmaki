@@ -91,10 +91,10 @@ function(cmaki_find_package PACKAGE)
 	else()
 		set(NO_USE_CACHE_LOCAL ${NOCACHE_LOCAL})
 	endif()
-	if(NOT DEFINED NOCACHE)
+	if(NOT DEFINED NOCACHE_REMOTE)
 		set(NO_USE_CACHE_REMOTE FALSE)
 	else()
-		set(NO_USE_CACHE_REMOTE ${NOCACHE})
+		set(NO_USE_CACHE_REMOTE ${NOCACHE_REMOTE})
 	endif()
 
 	#######################################################
@@ -133,8 +133,10 @@ function(cmaki_find_package PACKAGE)
 		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
 		set(http_package_cmake_filename ${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename})
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
-		# TODO: evitar descarga si NO_USE_CACHE_REMOTE es true
-		cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
+		if(NOT ${NO_USE_CACHE_REMOTE})
+			cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
+			message("Downloading ${http_package_cmake_filename} ...")
+		endif()
 		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
 		if(NOT "${COPY_SUCCESFUL}" OR ${NO_USE_CACHE_REMOTE})
 
@@ -386,6 +388,7 @@ macro(cmaki_download_package)
 		if(EXISTS "${package_compressed_md5}")
 			file(READ "${package_compressed_md5}" md5sum )
 			string(REGEX MATCH "[0-9a-fA-F]*" md5sum "${md5sum}")
+			# TODO: use md5sum
 			# cmaki_download_file("${http_package_cmake_filename}" "${package_compessed}" "${md5sum}" )
 			cmaki_download_file("${http_package_cmake_filename}" "${package_compessed}")
 			if( NOT "${COPY_SUCCESFUL}" )
@@ -400,7 +403,7 @@ macro(cmaki_download_package)
 
 	if(EXISTS "${package_compessed}")
 		file(MAKE_DIRECTORY "${package_uncompressed_dir}")
-		MESSAGE("Extracting ${package_compessed} into ${package_uncompressed_dir}...")
+		message("Extracting ${package_compessed} into ${package_uncompressed_dir}...")
 		execute_process(
 			COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_compessed}"
 			WORKING_DIRECTORY "${package_uncompressed_dir}"
