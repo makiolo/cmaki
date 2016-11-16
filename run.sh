@@ -1,17 +1,8 @@
 #!/bin/bash
 set -e
 MODE=${1:-Debug}
-COMPILER=${2:-clang}
-"${NOCACHE:?FALSE}"
-"${NOCACHE_LOCAL:?FALSE}"
-if [[ $COMPILER == "clang" ]];
-then
-	export CC=clang-3.6
-	export CXX=clang++-3.6
-else
-	export CC=gcc-4.9
-	export CXX=g++-4.9
-fi
+# "${NOCACHE:?FALSE}"
+# "${NOCACHE_LOCAL:?FALSE}"
 
 if [[ "$OSTYPE" == "cygwin" ]]; then
 	PATH=$(cygpath "E:\dev\gtc1\bin\cmake-3.4.3-win32-x86\bin"):$PATH
