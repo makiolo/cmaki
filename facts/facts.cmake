@@ -252,22 +252,22 @@ function(cmaki_find_package PACKAGE)
 		find_package(${PACKAGE} ${VERSION} REQUIRED)
 	endif()
 
-	# 13 añadir los includes
+	# 13 aÃ±adir los includes
 	string(TOUPPER "${PACKAGE}" PACKAGE_UPPER)
 	foreach(INCLUDE_DIR ${${PACKAGE_UPPER}_INCLUDE_DIRS})
 		list(APPEND CMAKI_INCLUDE_DIRS "${INCLUDE_DIR}")
 	endforeach()
 
-	# 14. a�adir los libdir
+	# 14. añadir los libdir
 	foreach(LIB_DIR ${${PACKAGE_UPPER}_LIBRARIES})
 		list(APPEND CMAKI_LIBRARIES "${LIB_DIR}")
 	endforeach()
 
-	# 15. añadir variables especificas
+	# 15. aÃ±adir variables especificas
 	set(${PACKAGE_UPPER}_INCLUDE_DIRS "${${PACKAGE_UPPER}_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(${PACKAGE_UPPER}_LIBRARIES "${${PACKAGE_UPPER}_LIBRARIES}" PARENT_SCOPE)
 
-	# 16. añaadir variabes generales
+	# 16. aÃ±aadir variabes generales
 	set(CMAKI_INCLUDE_DIRS "${CMAKI_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(CMAKI_LIBRARIES "${CMAKI_LIBRARIES}" PARENT_SCOPE)
 
@@ -517,6 +517,7 @@ function(cmaki2_test)
 endfunction()
 
 macro(cmaki2_gtest)
+	cmaki_find_package(google-gtest)
 	cmaki_find_package(google-gmock)
 	cmaki2_test(${ARGV})
 endmacro()
