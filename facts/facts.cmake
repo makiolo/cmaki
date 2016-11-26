@@ -156,7 +156,7 @@ function(cmaki_find_package PACKAGE)
 			# 5. compilo y genera el paquete en local
 			message("Generating artifact ${PACKAGE} ...")
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH}
+				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
@@ -216,35 +216,35 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE "${package_generated_file}")
 			endif()
 
-			# 9. subir artefactos
-			message("-- uploading ${package_generated_file}")
-			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
-				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-				RESULT_VARIABLE upload_result1
-				)
-			if(upload_result1)
-				# upload not is fatal
-				message("error in upload ${package_generated_file})")
-				file(REMOVE_RECURSE "${depends_bin_package}")
-				file(REMOVE_RECURSE "${depends_package}")
-				file(REMOVE "${package_uncompressed_file}")
-				file(REMOVE "${package_generated_file}")
-			endif()
-			message("-- uploading ${package_cmake_generated_file}")
-			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
-				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-				RESULT_VARIABLE upload_result2
-				)
-			if(upload_result2)
-				# upload not is fatal
-				message("error in upload ${package_cmake_generated_file})")
-				file(REMOVE_RECURSE "${depends_bin_package}")
-				file(REMOVE_RECURSE "${depends_package}")
-				file(REMOVE "${package_uncompressed_file}")
-				file(REMOVE "${package_generated_file}")
-			endif()
+			# # 9. subir artefactos
+			# message("-- uploading ${package_generated_file}")
+			# execute_process(
+			# 	COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
+			# 	WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+			# 	RESULT_VARIABLE upload_result1
+			# 	)
+			# if(upload_result1)
+			# 	# upload not is fatal
+			# 	message("error in upload ${package_generated_file})")
+			# 	file(REMOVE_RECURSE "${depends_bin_package}")
+			# 	file(REMOVE_RECURSE "${depends_package}")
+			# 	file(REMOVE "${package_uncompressed_file}")
+			# 	file(REMOVE "${package_generated_file}")
+			# endif()
+			# message("-- uploading ${package_cmake_generated_file}")
+			# execute_process(
+			# 	COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
+			# 	WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+			# 	RESULT_VARIABLE upload_result2
+			# 	)
+			# if(upload_result2)
+			# 	# upload not is fatal
+			# 	message("error in upload ${package_cmake_generated_file})")
+			# 	file(REMOVE_RECURSE "${depends_bin_package}")
+			# 	file(REMOVE_RECURSE "${depends_package}")
+			# 	file(REMOVE "${package_uncompressed_file}")
+			# 	file(REMOVE "${package_generated_file}")
+			# endif()
 
 			# 10. borro los 2 tar gz
 			file(REMOVE "${package_generated_file}")
