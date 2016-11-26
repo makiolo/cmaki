@@ -182,13 +182,12 @@ function(cmaki_find_package PACKAGE)
 			endif()
 			#######################################################
 
-			# 7. subo el artefacto y los ficheros de cmake
 			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}.tar.gz)
 			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
 			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
 			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
 
-			# 8. descomprimo el artefacto
+			# 7. descomprimo el artefacto
 			execute_process(
 				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
 				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
@@ -216,37 +215,7 @@ function(cmaki_find_package PACKAGE)
 				file(REMOVE "${package_generated_file}")
 			endif()
 
-			# # 9. subir artefactos
-			# message("-- uploading ${package_generated_file}")
-			# execute_process(
-			# 	COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_generated_file}
-			# 	WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-			# 	RESULT_VARIABLE upload_result1
-			# 	)
-			# if(upload_result1)
-			# 	# upload not is fatal
-			# 	message("error in upload ${package_generated_file})")
-			# 	file(REMOVE_RECURSE "${depends_bin_package}")
-			# 	file(REMOVE_RECURSE "${depends_package}")
-			# 	file(REMOVE "${package_uncompressed_file}")
-			# 	file(REMOVE "${package_generated_file}")
-			# endif()
-			# message("-- uploading ${package_cmake_generated_file}")
-			# execute_process(
-			# 	COMMAND python ${ARTIFACTS_PATH}/upload_package.py --url=${CMAKI_REPOSITORY}/upload.php --filename=${package_cmake_generated_file}
-			# 	WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-			# 	RESULT_VARIABLE upload_result2
-			# 	)
-			# if(upload_result2)
-			# 	# upload not is fatal
-			# 	message("error in upload ${package_cmake_generated_file})")
-			# 	file(REMOVE_RECURSE "${depends_bin_package}")
-			# 	file(REMOVE_RECURSE "${depends_package}")
-			# 	file(REMOVE "${package_uncompressed_file}")
-			# 	file(REMOVE "${package_generated_file}")
-			# endif()
-
-			# 10. borro los 2 tar gz
+			# 8. borro los 2 tar gz
 			file(REMOVE "${package_generated_file}")
 			file(REMOVE "${package_cmake_generated_file}")
 
@@ -274,7 +243,7 @@ function(cmaki_find_package PACKAGE)
 		message(FATAL_ERROR "can't save package version: ${PACKAGE} ${VERSION}")
 	endif()
 
-	# 12. hacer find_package tradicional, ahora que tenemos todo
+	# 12. hacer find_package tradicional, ahora que tenemos los ficheros de cmake
 	if(${PACKAGE_MODE} STREQUAL "EXACT")
 		# message("-- using ${PACKAGE} in EXACT")
 		find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
@@ -289,7 +258,7 @@ function(cmaki_find_package PACKAGE)
 		list(APPEND CMAKI_INCLUDE_DIRS "${INCLUDE_DIR}")
 	endforeach()
 
-	# 14. aÃ±adir los libdir
+	# 14. añadir los libdir
 	foreach(LIB_DIR ${${PACKAGE_UPPER}_LIBRARIES})
 		list(APPEND CMAKI_LIBRARIES "${LIB_DIR}")
 	endforeach()
@@ -305,7 +274,6 @@ function(cmaki_find_package PACKAGE)
 endfunction()
 
 macro(cmaki_package_version_check)
-	###################################
 	# llamar a check_remote_version
 	# dando el nombre recibo la version
 	execute_process(
@@ -427,6 +395,7 @@ function(cmaki2_executable)
 	set(_EXECUTABLE_NAME ${_MAIN_NAME})
 	source_group( "Source Files" FILES ${_SOURCES} )
 	common_flags()
+	include_directories(${CMAKE_SOURCE_DIR})
 	include_directories(${CMAKE_SOURCE_DIR}/..)
 	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
 		include_directories(${INCLUDE_DIR})
@@ -461,6 +430,7 @@ function(cmaki2_library)
 	set(_LIBRARY_NAME ${_MAIN_NAME})
 	source_group( "Source Files" FILES ${_SOURCES} )
 	common_flags()
+	include_directories(${CMAKE_SOURCE_DIR})
 	include_directories(${CMAKE_SOURCE_DIR}/..)
 	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
 		include_directories(${INCLUDE_DIR})
@@ -490,6 +460,7 @@ function(cmaki2_static_library)
 	set(_LIBRARY_NAME ${_MAIN_NAME})
 	source_group( "Source Files" FILES ${_SOURCES} )
 	common_flags()
+	include_directories(${CMAKE_SOURCE_DIR})
 	include_directories(${CMAKE_SOURCE_DIR}/..)
 	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
 		include_directories(${INCLUDE_DIR})
@@ -539,14 +510,13 @@ function(cmaki2_test)
 	endforeach()
 	add_test(
 		NAME ${_TEST_NAME}_exe
-		COMMAND ${_TEST_NAME}_exe --gtest_repeat=20 --gtest_break_on_failure --gtest_shuffle
+		COMMAND ${_TEST_NAME}_exe --gtest_repeat=5 --gtest_break_on_failure --gtest_shuffle
 		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
 	generate_vcxproj_user(${_TEST_NAME})
 
 endfunction()
 
 macro(cmaki2_gtest)
-	cmaki_find_package(google-gtest)
 	cmaki_find_package(google-gmock)
 	cmaki2_test(${ARGV})
 endmacro()
