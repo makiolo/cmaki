@@ -4,8 +4,8 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
-option(COVERAGE "active coverage (only clang)" TRUE)
-option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "thread")
+option(COVERAGE "active coverage (only clang)" FALSE)
+option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "")
 
 macro(cmaki_setup)
 	enable_modern_cpp()
