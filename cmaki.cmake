@@ -4,8 +4,8 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
-option(COVERAGE "active coverage (only clang)" FALSE)
-option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "")
+option(COVERAGE "active coverage (only clang)" TRUE)
+option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "thread")
 
 macro(cmaki_setup)
 	enable_modern_cpp()
@@ -409,4 +409,5 @@ macro(generate_clang)
 	STRING(REGEX REPLACE ";" "\n" extra_parameters "${extra_parameters}")
 	FILE(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/.clang_complete" "${extra_parameters}\n")
 endmacro()
+
 
