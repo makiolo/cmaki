@@ -15,8 +15,8 @@ else
 	GENERATOR="Unix Makefiles"
 fi
 
-(cd cmaki && git pull)
-(cd cmaki_generator && git pull)
+(cd cmaki && git pull origin master)
+(cd cmaki_generator && git pull origin master)
 echo "running in mode $MODE ... ($CC / $CXX)"
 mkdir -p $CC/$MODE
 cd $CC/$MODE
