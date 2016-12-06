@@ -303,6 +303,15 @@ macro(enable_modern_cpp)
 		add_definitions(-Wno-error=unused-result)
 		add_definitions(-Wno-error=sign-compare)
 
+		# raknet
+		add_definitions(-Wno-error=address)
+		add_definitions(-Wno-error=cast-qual)
+		add_definitions(-Wno-error=unused-but-set-variable)
+		add_definitions(-Wno-error=missing-field-initializers)
+		add_definitions(-Wno-error=float-conversion)
+		add_definitions(-Wno-error=write-strings)
+		add_definitions(-Wno-error=format-nonliteral)
+
 		# TODO: remove
 		add_definitions(-Wno-error=reorder)
 
