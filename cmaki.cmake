@@ -306,7 +306,6 @@ macro(enable_modern_cpp)
 		# raknet
 		add_definitions(-Wno-error=address)
 		add_definitions(-Wno-error=cast-qual)
-		add_definitions(-Wno-error=unused-but-set-variable)
 		add_definitions(-Wno-error=missing-field-initializers)
 		add_definitions(-Wno-error=float-conversion)
 		add_definitions(-Wno-error=write-strings)
@@ -336,6 +335,7 @@ macro(enable_modern_cpp)
 			add_definitions(-Wno-error=mismatched-tags)
 			add_definitions(-Wno-error=overloaded-virtual)
 			add_definitions(-Wno-error=unused-private-field)
+			add_definitions(-Wno-error=unused-but-set-variable)
 		endif()
 
 		# In Linux default now is not export symbols
@@ -418,5 +418,4 @@ macro(generate_clang)
 	STRING(REGEX REPLACE ";" "\n" extra_parameters "${extra_parameters}")
 	FILE(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/.clang_complete" "${extra_parameters}\n")
 endmacro()
-
 
