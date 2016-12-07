@@ -16,3 +16,6 @@ git add .gitignore
 cp -v $PWD/init/api.h .
 git add api.h
 
+cp -v $PWD/init/CMakeLists.txt .
+git add CMakeLists.txt
+
