@@ -21,3 +21,4 @@ test_script:
 
 on_success:
     - cmd: cd cmaki_generator && build fast-event-system --server=http://artifacts.myftp.biz:8080 && cd ..
+
