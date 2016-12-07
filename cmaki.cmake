@@ -336,6 +336,7 @@ macro(enable_modern_cpp)
 			add_definitions(-Wno-error=mismatched-tags)
 			add_definitions(-Wno-error=overloaded-virtual)
 			add_definitions(-Wno-error=unused-private-field)
+			add_definitions(-Wno-error=unreachable-code)
 		endif()
 
 		# In Linux default now is not export symbols
