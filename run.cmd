@@ -1,4 +1,13 @@
 @echo off
+
+cd cmaki
+git pull origin master
+cd ..
+
+cd cmaki_generator
+git pull origin master
+cd ..
+
 set GENERATOR=Visual Studio 14 2015
 set MODE=Debug
 echo running in mode %MODE% ...
