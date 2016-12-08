@@ -5,7 +5,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
 option(COVERAGE "active coverage (only clang)" FALSE)
-option(SANITIZER "active sanitizers (address,address-full,memory,thread) (only clang)" "")
+option(SANITIZER "active sanitizers (address,address-full,memory,thread)" "memory")
 
 macro(cmaki_setup)
 	enable_modern_cpp()
@@ -231,17 +231,23 @@ endfunction()
 macro(common_flags)
 
 	if(SANITIZER)
-		add_definitions(-g3)
-		# "address-full" "memory" "thread"
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZER}")
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER}")
-		add_definitions(-fsanitize=${SANITIZER})
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+			message("-- sanitizer enabled: ${SANITIZER} (clang)")
+			add_definitions(-g3)
+			# "address-full" "memory" "thread"
+			SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZER}")
+			SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER}")
+			add_definitions(-fsanitize=${SANITIZER})
+		endif()
 	endif()
 
 	IF(COVERAGE)
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+			message("-- coverage enabled (clang)")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 		else()
+			message("-- coverage enabled (gcc)")
+			
 			# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs")
 			# SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -lgcov")
 			
