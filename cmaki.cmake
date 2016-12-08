@@ -5,7 +5,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
 option(COVERAGE "active coverage (only clang)" FALSE)
-option(SANITIZER "active sanitizers (address,address-full,memory,thread)" "memory")
+option(SANITIZER "active sanitizers" FALSE)
 
 macro(cmaki_setup)
 	enable_modern_cpp()
@@ -232,25 +232,25 @@ macro(common_flags)
 
 	if(SANITIZER)
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-			message("-- sanitizer enabled: ${SANITIZER} (clang)")
-			add_definitions(-g3)
-			# "address-full" "memory" "thread"
-			SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZER}")
-			SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER}")
-			add_definitions(-fsanitize=${SANITIZER})
+			# (address,address-full,memory,thread)
+			# http://clang.llvm.org/docs/AddressSanitizer.html
+			set(SANITIZER_MODE "address")
+			message("-- sanitizer enabled: ${SANITIZER_MODE} (clang)")
+			add_definitions(-g -fno-omit-frame-pointer)
+			SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=${SANITIZER_MODE}")
+			SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=${SANITIZER_MODE}")
+			add_definitions(-fsanitize=${SANITIZER_MODE})
 		endif()
 	endif()
 
-	IF(COVERAGE)
+	# IF(COVERAGE)
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			message("-- coverage enabled (clang)")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-instr-generate -fcoverage-mapping")
 		else()
 			message("-- coverage enabled (gcc)")
-			
 			# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs")
 			# SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -lgcov")
-			
 			set(CMAKE_C_OUTPUT_EXTENSION_REPLACE 1)
 			set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -coverage")
 			set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE 1)
@@ -258,7 +258,7 @@ macro(common_flags)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-elide-constructors")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline")
 		endif()
-	endif()
+	# endif()
 
 	if(WIN32 AND (NOT MINGW) AND (NOT MSYS))
 		# c++ exceptions and RTTI
