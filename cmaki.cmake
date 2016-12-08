@@ -328,6 +328,10 @@ macro(enable_modern_cpp)
 		add_definitions(-Wno-error=write-strings)
 		add_definitions(-Wno-error=format-nonliteral)
 
+		# sdl2
+		add_definitions(-Wno-error=sign-conversion)
+		add_definitions(-Wno-error=discarded-qualifiers)
+
 		# TODO: remove
 		add_definitions(-Wno-error=reorder)
 
