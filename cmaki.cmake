@@ -290,8 +290,12 @@ macro(enable_modern_cpp)
 		# activate all warnings and convert in errors
 		# add_definitions(-Weffc++)
 		# add_definitions(-pedantic -pedantic-errors)
+		
+		# Python: need disabling: initialization discards ‘const’ qualifier from pointer target type
+		# add_definitions(-Werror)
+		
 		add_definitions(-Wall -Wextra -Waggregate-return -Wcast-align -Wcast-qual -Wconversion)
-		add_definitions(-Wdisabled-optimization -Werror -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k)
+		add_definitions(-Wdisabled-optimization -Wformat=2 -Wformat-nonliteral -Wformat-security -Wformat-y2k)
 		add_definitions(-Wimport  -Winit-self  -Winline -Winvalid-pch -Wlong-long -Wmissing-field-initializers -Wmissing-format-attribute)
 		add_definitions(-Wpointer-arith -Wredundant-decls -Wshadow)
 		add_definitions(-Wstack-protector -Wunreachable-code -Wunused)
