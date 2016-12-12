@@ -521,6 +521,7 @@ endmacro()
 
 macro(cmaki_python_library)
 	cmaki2_library(${ARGV})
-	list(GET ${ARGV} 0 TARGET_NAME)
+	set(PARAMETERS ${ARGV})
+	list(GET PARAMETERS 0 TARGET_NAME)
 	set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
 endmacro()
