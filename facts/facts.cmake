@@ -508,7 +508,7 @@ function(cmaki2_test)
 	endforeach()
 	add_test(
 		NAME ${_TEST_NAME}_exe
-		COMMAND ${_TEST_NAME}_exe --gtest_repeat=5 --gtest_break_on_failure --gtest_shuffle
+		COMMAND ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
 		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
 	generate_vcxproj_user(${_TEST_NAME})
 
@@ -524,4 +524,10 @@ macro(cmaki_python_library)
 	set(PARAMETERS ${ARGV})
 	list(GET PARAMETERS 0 TARGET_NAME)
 	set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
+	# foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
+	# 	install(    TARGETS ${TARGET_NAME}
+	# 				DESTINATION ${BUILD_TYPE}/lib/python3.5
+	# 				CONFIGURATIONS ${BUILD_TYPE})
+	# endforeach()
 endmacro()
+
