@@ -515,6 +515,7 @@ function(cmaki2_test)
 endfunction()
 
 macro(cmaki2_gtest)
+	cmaki_find_package(google-gtest)
 	cmaki_find_package(google-gmock)
 	cmaki2_test(${ARGV})
 endmacro()
