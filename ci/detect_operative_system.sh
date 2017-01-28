@@ -5,6 +5,7 @@
 OS=`uname -s`
 REV=`uname -r`
 MACH=`uname -m`
+CC="${CC:-default}"
 OSSTR=$(uname | tr "[:upper:]" "[:lower:]")
 if [ "${OS}" = "SunOS" ] ; then
 	OS=Solaris
@@ -39,9 +40,8 @@ elif [ "${OS}" = "Linux" ] ; then
 	DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
 	fi
 
-	OSSTR="${OS}_${DIST}_${REV}${PSUEDONAME}${MACH}"
+	OSSTR="${OS}_${DIST}_${REV}${PSUEDONAME}${MACH}_${CC}"
 fi
 
 echo $OSSTR
-# echo Linux_Ubuntu_trusty_x86_64
 
