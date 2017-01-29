@@ -45,10 +45,10 @@ elif [ "${OS}" = "Linux" ] ; then
 	OSSTR="${OS}_${DIST}_${REV}${PSUEDONAME}${MACH}"
 fi
 
-if [ "$CC" == "UNDEFINED" ]; then
+if [ "${CC}" = "UNDEFINED" ]; then
 	echo "${OSSTR}"
 else
-	if [ "$MODE" == "UNDEFINED" ]; then
+	if [ "${MODE}" = "UNDEFINED" ]; then
 		echo "${OSSTR}_${CC}"
 	else
 		echo "${OSSTR}_${CC}_${MODE}"

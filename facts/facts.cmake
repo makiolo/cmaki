@@ -155,13 +155,15 @@ function(cmaki_find_package PACKAGE)
 
 			# 5. compilo y genera el paquete en local
 			message("Generating artifact ${PACKAGE} ...")
+			MESSAGE("run in ${ARTIFACTS_PATH}")
+			MESSAGE("python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY} -o")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY} -o
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				RESULT_VARIABLE artifacts_result
 				)
 			if(artifacts_result)
-				message(FATAL_ERROR "can't create artifact ${PACKAGE}")
+				message(FATAL_ERROR "can't create artifact ${PACKAGE}: error ${artifacts_result}")
 				file(REMOVE_RECURSE "${depends_bin_package}")
 				file(REMOVE_RECURSE "${depends_package}")
 				file(REMOVE "${package_uncompressed_file}")
@@ -245,10 +247,10 @@ function(cmaki_find_package PACKAGE)
 
 	# 12. hacer find_package tradicional, ahora que tenemos los ficheros de cmake
 	if(${PACKAGE_MODE} STREQUAL "EXACT")
-		# message("-- using ${PACKAGE} in EXACT")
+		message("-- using ${PACKAGE} in EXACT")
 		find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
 	else()
-		# message("-- using ${PACKAGE} in COMPATIBLE")
+		message("-- using ${PACKAGE} in COMPATIBLE")
 		find_package(${PACKAGE} ${VERSION} REQUIRED)
 	endif()
 

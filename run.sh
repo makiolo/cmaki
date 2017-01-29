@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-MODE=${1:-Debug}
 NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
 CC="${CC:-gcc}"
 CXX="${CXX:-g++}"
+MODE=${MODE:-Debug}
 
 if [[ "$OSTYPE" == "cygwin" ]]; then
 	PATH=$(cygpath "E:\dev\gtc1\bin\cmake-3.4.3-win32-x86\bin"):$PATH
