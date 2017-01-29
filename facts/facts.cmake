@@ -236,21 +236,12 @@ function(cmaki_find_package PACKAGE)
 		endif()
 	endif()
 
-	# 11. Guardar nuestra version en uso
-	# execute_process(
-	# 	COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --version=${VERSION} --depends=${DEPENDS_PATHFILE}
-	# 	WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-	# 	RESULT_VARIABLE artifacts_result)
-	# if(artifacts_result)
-	# 	message(FATAL_ERROR "can't save package version: ${PACKAGE} ${VERSION}")
-	# endif()
-
 	# 12. hacer find_package tradicional, ahora que tenemos los ficheros de cmake
 	if(${PACKAGE_MODE} STREQUAL "EXACT")
-		message("-- using ${PACKAGE} in EXACT")
+		# message("-- using ${PACKAGE} in EXACT")
 		find_package(${PACKAGE} ${VERSION} EXACT REQUIRED)
 	else()
-		message("-- using ${PACKAGE} in COMPATIBLE")
+		# message("-- using ${PACKAGE} in COMPATIBLE")
 		find_package(${PACKAGE} ${VERSION} REQUIRED)
 	endif()
 
