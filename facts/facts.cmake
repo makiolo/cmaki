@@ -130,7 +130,8 @@ function(cmaki_find_package PACKAGE)
 	set(depends_dir "${DEPENDS_PATH}")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
-	if(NOT EXISTS "${depends_package}" OR "${NO_USE_CACHE_LOCAL}")
+	set(depends_package_platform "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}/${CMAKI_PLATFORM}.cmake")
+	if(NOT EXISTS "${depends_package_platform}" OR "${NO_USE_CACHE_LOCAL}")
 		# pido un paquete, en funcion de:
 		#		- paquete
 		#		- version
