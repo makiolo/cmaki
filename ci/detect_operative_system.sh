@@ -6,6 +6,7 @@ OS=`uname -s`
 REV=`uname -r`
 MACH=`uname -m`
 CC="${CC:-default}"
+CC=$(basename $CC)
 OSSTR=$(uname | tr "[:upper:]" "[:lower:]")
 if [ "${OS}" = "SunOS" ] ; then
 	OS=Solaris
