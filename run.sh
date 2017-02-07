@@ -2,9 +2,9 @@
 set -e
 NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
-CC="${CC:-clang}"
-CXX="${CXX:-clang++}"
-MODE=${MODE:-Debug}
+export CC="${CC:-clang}"
+export CXX="${CXX:-clang++}"
+export MODE=${MODE:-Debug}
 
 if [[ "$OSTYPE" == "cygwin" ]]; then
 	PATH=$(cygpath "E:\dev\gtc1\bin\cmake-3.4.3-win32-x86\bin"):$PATH
