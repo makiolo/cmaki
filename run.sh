@@ -2,8 +2,10 @@
 set -e
 NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
-export CC="${CC:-clang}"
-export CXX="${CXX:-clang++}"
+# export CC="${CC:-clang}"
+# export CXX="${CXX:-clang++}"
+export CC="${CC:-gcc}"
+export CXX="${CXX:-g++}"
 export MODE=${MODE:-Debug}
 
 if [[ "$OSTYPE" == "cygwin" ]]; then
