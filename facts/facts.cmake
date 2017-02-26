@@ -145,10 +145,9 @@ function(cmaki_find_package PACKAGE)
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
 		if(NOT "${NO_USE_CACHE_REMOTE}")
 			cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
-			set(COPY_SUCCESFUL1 "${COPY_SUCCESFUL}")
 		endif()
 		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
-		if(NOT "${COPY_SUCCESFUL1}" OR "${NO_USE_CACHE_REMOTE}")
+		if(NOT "${COPY_SUCCESFUL}" OR "${NO_USE_CACHE_REMOTE}")
 
 			file(REMOVE_RECURSE "${depends_bin_package}")
 			file(REMOVE_RECURSE "${depends_package}")
