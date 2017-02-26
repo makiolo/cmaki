@@ -514,14 +514,14 @@ macro(cmaki2_gtest)
 endmacro()
 
 macro(cmaki_python_library)
-	cmaki2_library(${ARGV})
+	cmaki2_library(${ARGV}) # INSTALL lib/python3.5/lib-dynload
 	set(PARAMETERS ${ARGV})
 	list(GET PARAMETERS 0 TARGET_NAME)
 	set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
-	# foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-	# 	install(    TARGETS ${TARGET_NAME}
-	# 				DESTINATION ${BUILD_TYPE}/lib/python3.5
-	# 				CONFIGURATIONS ${BUILD_TYPE})
-	# endforeach()
+	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
+		install(    TARGETS ${TARGET_NAME}
+					DESTINATION ${BUILD_TYPE}/lib/python3.5/lib-dynload
+					CONFIGURATIONS ${BUILD_TYPE})
+	endforeach()
 endmacro()
 
