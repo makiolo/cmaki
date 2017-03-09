@@ -11,6 +11,7 @@ macro(cmaki_setup)
 	enable_modern_cpp()
 	enable_testing()
 	set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+	SET(CMAKE_BUILD_TYPE_INIT Release)
 endmacro()
 
 macro (mark_as_internal _var)
@@ -228,7 +229,22 @@ function(cmaki_test)
 
 endfunction()
 
+macro(common_linking)
+
+	set(PARAMETERS ${ARGV})
+	list(GET PARAMETERS 0 TARGET)
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+		target_link_libraries(${TARGET} -lubsan)
+	endif()
+
+endmacro()
+
 macro(common_flags)
+
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+		add_compile_options(-fsanitize=undefined)
+	endif()
+
 
 	if(SANITIZER)
 		if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -395,7 +411,6 @@ macro(enable_modern_cpp)
 	else()
 		add_definitions(${EXTRA_DEF})
 	endif()
-	SET(CMAKE_BUILD_TYPE_INIT Release)
 endmacro()
 
 # TODO: only works in win64 ?

@@ -409,6 +409,7 @@ function(cmaki2_executable)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_EXECUTABLE_NAME} -lpthread)
 	endif()
+	common_linking(${_EXECUTABLE_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_EXECUTABLE_NAME}
 					DESTINATION ${BUILD_TYPE}
@@ -439,6 +440,7 @@ function(cmaki2_library)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_LIBRARY_NAME} -lpthread)
 	endif()
+	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
 					DESTINATION ${BUILD_TYPE}
@@ -469,6 +471,7 @@ function(cmaki2_static_library)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_LIBRARY_NAME} -lpthread)
 	endif()
+	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
 					DESTINATION ${BUILD_TYPE}
@@ -480,6 +483,7 @@ endfunction()
 function(cmaki2_test)
 	cmaki_parse_parameters(${ARGV})
 	set(_TEST_NAME ${_MAIN_NAME})
+	common_flags()
 	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
 		include_directories(${INCLUDE_DIR})
 	endforeach()
@@ -495,6 +499,7 @@ function(cmaki2_test)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_TEST_NAME}_exe -lpthread)
 	endif()
+	common_linking(${_TEST_NAME}_exe)
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_TEST_NAME}_exe
 					DESTINATION ${BUILD_TYPE}
