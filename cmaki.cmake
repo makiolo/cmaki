@@ -358,7 +358,7 @@ macro(enable_modern_cpp)
 			add_definitions(-Wno-error=overloaded-virtual)
 			add_definitions(-Wno-error=unused-private-field)
 			add_definitions(-Wno-error=unreachable-code)
-			add_definitions(-Wno-error=discarded-qualifiers)
+			# add_definitions(-Wno-error=discarded-qualifiers)
 		endif()
 
 		# In Linux default now is not export symbols
