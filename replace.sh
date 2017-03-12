@@ -10,23 +10,26 @@ else
 	run=""
 fi
 
+command="ag -w --cpp $1 -l --ignore cmaki --ignore cmaki_generator --ignore depends --ignore gcc --ignore clang --ignore bin"
 if [[ $3 == "run" ]];
 then
-	echo run: "ag -w --cpp $1 -l --ignore cmaki --ignore depends --ignore build --ignore artifacts --ignore baul | xargs sed "s/\<$1\>/$2/g" $run"
+	echo run: "$command | xargs sed "s/\<$1\>/$2/g" $run"
 fi
-ag -w --cpp $1 -l --ignore cmaki --ignore depends --ignore build --ignore artifacts --ignore baul | xargs sed "s/\<$1\>/$2/g" $run
+$command | xargs sed "s/\<$1\>/$2/g" $run
+
+command_search_files=$command | egrep '$1.cpp$|$1.h$'
 
 # candidates files
 if [[ $3 == "run" ]];
 then
-	count=$(find . -type f -name "*$1.cpp" -o -name "*$1.h" | xargs grep -h -e "^#include" | grep -h $2 | wc -l)
+	count=$($command_search_files | xargs grep -h -e "^#include" | grep -h $2 | wc -l)
 else
-	count=$(find . -type f -name "*$1.cpp" -o -name "*$1.h" | xargs grep -h -e "^#include" | grep -h $1 | wc -l)
+	count=$($command_search_files | xargs grep -h -e "^#include" | grep -h $1 | wc -l)
 fi
 if [[ $count -gt 0 ]];
 then
 	echo "se renonbrara los siguientes ficheros (utilizando $MV):"
-	for file in $(find . -type f -name "*$1.cpp" -o -name "*$1.h");
+	for file in $($command_search_files);
 	do
 		destiny=$(echo $file | sed "s/\<$1\>/$2/g")
 		if [[ $3 == "run" ]];
