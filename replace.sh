@@ -11,25 +11,14 @@ else
 fi
 
 command="ag -w --cpp $1 -l --ignore cmaki --ignore cmaki_generator --ignore depends --ignore gcc --ignore clang --ignore bin"
-if [[ $3 == "run" ]];
-then
-	echo run: "$command | xargs sed "s/\<$1\>/$2/g" $run"
-fi
-$command | xargs sed "s/\<$1\>/$2/g" $run
+command_search_files="$command | grep -e $1.cpp$ -e $1.h$"
+command_search_files_count="$command_search_files | xargs -I{} grep -h -e ^#include {} | grep -h $1 | wc -l"
+count=$(eval $command_search_files_count)
 
-command_search_files=$command | egrep '$1.cpp$|$1.h$'
-
-# candidates files
-if [[ $3 == "run" ]];
-then
-	count=$($command_search_files | xargs grep -h -e "^#include" | grep -h $2 | wc -l)
-else
-	count=$($command_search_files | xargs grep -h -e "^#include" | grep -h $1 | wc -l)
-fi
 if [[ $count -gt 0 ]];
 then
 	echo "se renonbrara los siguientes ficheros (utilizando $MV):"
-	for file in $($command_search_files);
+	for file in $(eval $command_search_files);
 	do
 		destiny=$(echo $file | sed "s/\<$1\>/$2/g")
 		if [[ $3 == "run" ]];
@@ -43,4 +32,13 @@ then
 else
 	echo "No es necesario renombrar ficheros"
 fi
+
+if [[ $3 == "run" ]];
+then
+	# echo run: "$command | xargs sed "s/\<$1\>/$2/g" $run"
+	echo replacing ...
+else
+	echo replace in dry-run
+fi
+eval $command | xargs -I{} sed "s@\<$1\>@$2@g" $run {}
 
