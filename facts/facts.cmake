@@ -521,9 +521,14 @@ endmacro()
 macro(cmaki_python_library)
 	cmaki_find_package(python)
 	cmaki_find_package(boost-python)
-	cmaki2_library(${ARGV} PTHREADS DESTINATION lib/python3.5/lib-dynload)
+	cmaki2_library(${ARGV} PTHREADS)
 	cmaki_parse_parameters(${ARGV})
 	set_target_properties(${_MAIN_NAME} PROPERTIES PREFIX "")
+	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
+		INSTALL(	TARGETS ${_MAIN_NAME}
+				DESTINATION ${BUILD_TYPE}/lib/python3.5/lib-dynload
+				CONFIGURATIONS ${BUILD_TYPE})
+	endforeach()
 endmacro()
 
 macro(cmaki_python_gtest)
@@ -539,7 +544,6 @@ macro(cmaki_python_test)
 	cmaki_find_package(boost-python)
 	cmaki_parse_parameters(${ARGV})
 	cmaki_install_file(${_SOURCES})
-	enable_testing()
 	add_test(	NAME ${_MAIN_NAME}_test
 			COMMAND ./bin/python3 ${_SOURCES}
 			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
