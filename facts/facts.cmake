@@ -412,7 +412,7 @@ function(cmaki2_executable)
 	common_linking(${_EXECUTABLE_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_EXECUTABLE_NAME}
-					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 	generate_vcxproj_user(${_EXECUTABLE_NAME})
@@ -443,7 +443,7 @@ function(cmaki2_library)
 	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
-					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 
@@ -474,7 +474,7 @@ function(cmaki2_static_library)
 	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
-					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 
@@ -502,7 +502,7 @@ function(cmaki2_test)
 	common_linking(${_TEST_NAME}_exe)
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_TEST_NAME}_exe
-					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 	add_test(
@@ -521,7 +521,7 @@ endmacro()
 macro(cmaki_python_library)
 	cmaki_find_package(python)
 	cmaki_find_package(boost-python)
-	cmaki2_library(${ARGV} PTHREADS INSTALL lib/python3.5/lib-dynload)
+	cmaki2_library(${ARGV} PTHREADS DESTINATION lib/python3.5/lib-dynload)
 	cmaki_parse_parameters(${ARGV})
 	set_target_properties(${_MAIN_NAME} PROPERTIES PREFIX "")
 endmacro()
