@@ -547,6 +547,7 @@ macro(cmaki_python_test)
 	cmaki_find_package(python)
 	cmaki_find_package(boost-python)
 	cmaki_parse_parameters(${ARGV})
+	cmaki_install_file(${_SOURCES})
 	add_test(	NAME ${_MAIN_NAME}_test
 			COMMAND ./bin/python3 ${_SOURCES}
 			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
