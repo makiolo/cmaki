@@ -412,7 +412,7 @@ function(cmaki2_executable)
 	common_linking(${_EXECUTABLE_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_EXECUTABLE_NAME}
-					DESTINATION ${BUILD_TYPE}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 	generate_vcxproj_user(${_EXECUTABLE_NAME})
@@ -443,7 +443,7 @@ function(cmaki2_library)
 	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
-					DESTINATION ${BUILD_TYPE}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 
@@ -474,7 +474,7 @@ function(cmaki2_static_library)
 	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
-					DESTINATION ${BUILD_TYPE}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 
@@ -502,7 +502,7 @@ function(cmaki2_test)
 	common_linking(${_TEST_NAME}_exe)
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_TEST_NAME}_exe
-					DESTINATION ${BUILD_TYPE}
+					DESTINATION ${BUILD_TYPE}/${_SUFFIX_INSTALL}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 	add_test(
@@ -519,14 +519,37 @@ macro(cmaki2_gtest)
 endmacro()
 
 macro(cmaki_python_library)
-	cmaki2_library(${ARGV}) # INSTALL lib/python3.5/lib-dynload
-	set(PARAMETERS ${ARGV})
-	list(GET PARAMETERS 0 TARGET_NAME)
-	set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
-	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-		install(    TARGETS ${TARGET_NAME}
-					DESTINATION ${BUILD_TYPE}/lib/python3.5/lib-dynload
-					CONFIGURATIONS ${BUILD_TYPE})
-	endforeach()
+	cmaki_find_package(python)
+	cmaki_find_package(boost-python)
+	cmaki2_library(${ARGV} PTHREADS INSTALL lib/python3.5/lib-dynload)
+	cmaki_parse_parameters(${ARGV})
+	set_target_properties(${_MAIN_NAME} PROPERTIES PREFIX "")
 endmacro()
 
+macro(cmaki_python_gtest)
+	cmaki_find_package(python)
+	cmaki_find_package(boost-python)
+	cmaki2_gtest(${ARGV} PTHREADS)
+	cmaki_parse_parameters(${ARGV})
+	set_tests_properties(${_MAIN_NAME}_exe PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}")
+endmacro()
+
+macro(cmaki_python_test)
+	cmaki_find_package(python)
+	cmaki_find_package(boost-python)
+	cmaki_parse_parameters(${ARGV})
+	cmaki_install_file(${_SOURCES})
+	enable_testing()
+	add_test(	NAME ${_MAIN_NAME}_test
+			COMMAND ./bin/python3 ${_SOURCES}
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	set_tests_properties(${_MAIN_NAME}_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}")
+endmacro()
+
+macro(cmaki_install_python)
+	cmaki_find_package(python)
+	cmaki_find_package(boost-python)
+	get_filename_component(PYTHON3_DIR ${PYTHON3_EXECUTABLE} DIRECTORY)
+	get_filename_component(PYTHON3_PARENT_DIR ${PYTHON3_DIR} DIRECTORY)
+	cmaki_install_inside_dir(${PYTHON3_PARENT_DIR})
+endmacro()
