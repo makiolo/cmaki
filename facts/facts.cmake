@@ -535,7 +535,7 @@ macro(cmaki_python_library)
 	endforeach()
 endmacro()
 
-macro(cmaki_python_gtest)
+macro(cmaki_boost_python_test)
 	cmaki_find_package(python)
 	cmaki_find_package(boost-python)
 	cmaki2_gtest(${ARGV} PTHREADS)
@@ -545,7 +545,6 @@ endmacro()
 
 macro(cmaki_python_test)
 	cmaki_find_package(python)
-	cmaki_find_package(boost-python)
 	cmaki_parse_parameters(${ARGV})
 	add_test(	NAME ${_MAIN_NAME}_test
 			COMMAND ./bin/python3 ${_SOURCES}
@@ -553,7 +552,7 @@ macro(cmaki_python_test)
 	set_tests_properties(${_MAIN_NAME}_test PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}")
 endmacro()
 
-macro(cmaki_install_python)
+macro(cmaki_python_install)
 	cmaki_find_package(python)
 	cmaki_find_package(boost-python)
 	get_filename_component(PYTHON3_DIR ${PYTHON3_EXECUTABLE} DIRECTORY)
