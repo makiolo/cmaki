@@ -29,7 +29,8 @@ fi
 echo "running in mode $MODE ... ($CC / $CXX)"
 mkdir -p $CC/$MODE
 cd $CC/$MODE
-if [ -f ../../conanfile.txt ]; then
+if [ -f "../../conanfile.txt" ]; then
+	echo using conan ...
 	conan install ../..
 fi
 cmake ../.. -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL -DCOVERAGE=$COVERAGE
