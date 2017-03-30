@@ -240,9 +240,14 @@ endfunction()
 
 macro(common_linking)
 
-	set(PARAMETERS ${ARGV})
+	# set(PARAMETERS ${ARGV})
 	# list(GET PARAMETERS 0 TARGET)
 	# target_link_libraries(${TARGET} -lubsan)
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		add_compile_options(-fsanitize=address -shared-libasan -fno-omit-frame-pointer)
+	endif()
 
 endmacro()
 
