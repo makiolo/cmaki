@@ -248,8 +248,11 @@ endmacro()
 
 macro(common_flags)
 
-	if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release))
+	# https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		add_compile_options(-fsanitize=address -shared-libasan -fno-omit-frame-pointer)
 	endif()
 
 	if(SANITIZER)
