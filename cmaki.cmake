@@ -241,17 +241,15 @@ endfunction()
 macro(common_linking)
 
 	set(PARAMETERS ${ARGV})
-	list(GET PARAMETERS 0 TARGET)
-	if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-		target_link_libraries(${TARGET} -lubsan)
-	endif()
+	# list(GET PARAMETERS 0 TARGET)
+	# target_link_libraries(${TARGET} -lubsan)
 
 endmacro()
 
 macro(common_flags)
 
-	if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-		add_compile_options(-fsanitize=undefined)
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release))
+		add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
 	endif()
 
 	if(SANITIZER)
