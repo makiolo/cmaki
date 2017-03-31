@@ -239,14 +239,14 @@ function(cmaki_test)
 endfunction()
 
 macro(common_linking)
-
-	# set(PARAMETERS ${ARGV})
-	# list(GET PARAMETERS 0 TARGET)
-	# target_link_libraries(${TARGET} -lubsan)
+	
 	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -shared-libasan -fno-omit-frame-pointer")
+		set(PARAMETERS ${ARGV})
+		list(GET PARAMETERS 0 TARGET)
+		target_link_libraries(${TARGET} -lclang_rt.asan-x86_64)
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 	endif()
 
 endmacro()
@@ -257,7 +257,7 @@ macro(common_flags)
 	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -shared-libasan -fno-omit-frame-pointer")
+		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 	endif()
 
 	IF(COVERAGE)
