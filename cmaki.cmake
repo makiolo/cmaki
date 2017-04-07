@@ -165,6 +165,7 @@ function(cmaki_executable)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_EXECUTABLE_NAME} -lpthread)
 	endif()
+	common_linking(${_EXECUTABLE_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_EXECUTABLE_NAME}
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
@@ -192,6 +193,7 @@ function(cmaki_library)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_LIBRARY_NAME} -lpthread)
 	endif()
+	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
@@ -217,12 +219,12 @@ function(cmaki_test)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_TEST_NAME} -lpthread)
 	endif()
+	common_linking(${_TEST_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_TEST_NAME}
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-
 	IF(WIN32)
 		add_test(
 			NAME ${_TEST_NAME}__
@@ -258,7 +260,6 @@ macro(common_linking)
 endmacro()
 
 macro(common_flags)
-
 	# https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso
 	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --coverage")
@@ -408,7 +409,6 @@ macro(enable_modern_cpp)
 	endif()
 endmacro()
 
-# TODO: only works in win64 ?
 macro(generate_vcxproj_user _EXECUTABLE_NAME)
     IF(MSVC)
         set(project_vcxproj_user "${CMAKE_CURRENT_BINARY_DIR}/${_EXECUTABLE_NAME}.vcxproj.user")
