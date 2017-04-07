@@ -46,6 +46,8 @@ cmake --build . --config $MODE --target install -- -j8 -k || cmake --build . --c
 if [[ "$CC" == "gcc" ]]; then
 	if [[ "$MODE" == "Debug" ]]; then
 		# initial coverage
+		find ../.. -name "*.cpp" -o -name "*.h"
+		find ../.. -name "*.gcno" -o -name "*.gcda"
 		lcov -c -i -d ../.. -o coverage.base
 	fi
 fi
