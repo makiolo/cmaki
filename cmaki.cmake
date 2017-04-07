@@ -4,8 +4,6 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
-option(COVERAGE "active coverage (only clang)" FALSE)
-option(SANITIZER "active sanitizers" FALSE)
 
 macro(cmaki_setup)
 	enable_modern_cpp()
