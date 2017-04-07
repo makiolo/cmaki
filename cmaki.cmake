@@ -234,13 +234,40 @@ function(cmaki_test)
 		else()
 			if (BUILD_TYPE STREQUAL "Release")
 				message("-- Launch ${_TEST_NAME}__ with valgrind")
-				add_test(
-					NAME ${_TEST_NAME}__
-					# COMMAND valgrind --tool=callgrind ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}/${_TEST_NAME}
-					COMMAND ${_TEST_NAME}
-					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
-					CONFIGURATIONS ${BUILD_TYPE}
-					)
+				find_program(VALGRIND "valgrind")
+				if(VALGRIND)
+					# add_custom_target(${_TEST_NAME}_memcheck COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}>)
+					add_test(
+						NAME ${_TEST_NAME}_memcheck
+						COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}>
+						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+						CONFIGURATIONS ${BUILD_TYPE}
+						)
+					add_test(
+						NAME ${_TEST_NAME}_cachegrind
+						COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}>
+						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+						CONFIGURATIONS ${BUILD_TYPE}
+						)
+					add_test(
+						NAME ${_TEST_NAME}_helgrind
+						COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}>
+						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+						CONFIGURATIONS ${BUILD_TYPE}
+						)
+					add_test(
+						NAME ${_TEST_NAME}_callgrind
+						COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}>
+						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+						CONFIGURATIONS ${BUILD_TYPE}
+						)
+					add_test(
+						NAME ${_TEST_NAME}_drd
+						COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}>
+						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+						CONFIGURATIONS ${BUILD_TYPE}
+						)
+				endif()
 			else()
 				add_test(
 					NAME ${_TEST_NAME}__
@@ -258,8 +285,6 @@ endfunction()
 
 macro(common_linking)
 
-	message("CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}")
-	message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 	set(PARAMETERS ${ARGV})
 	list(GET PARAMETERS 0 TARGET)
 	# if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
@@ -414,19 +439,18 @@ macro(enable_modern_cpp)
 		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --coverage")
 	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pg")
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	# 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	# elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+	# 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 	endif()
 	# linker flags
 	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-		message("-- activate coverage")
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -pg")
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	# 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	# elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+	# 	SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 	endif()
 
 endmacro()
