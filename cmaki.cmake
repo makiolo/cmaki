@@ -233,11 +233,13 @@ function(cmaki_test)
 			message("-- Launch ${_TEST_NAME}__ with valgrind")
 			add_test(
 				NAME ${_TEST_NAME}__
-				COMMAND valgrind --tool=callgrind ${_TEST_NAME})
+				COMMAND valgrind --tool=callgrind ${_TEST_NAME}
+				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
 		else()
 			add_test(
 				NAME ${_TEST_NAME}__
-				COMMAND ${_TEST_NAME})
+				COMMAND ${_TEST_NAME}
+				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
 		endif()
 	endif()
 	generate_vcxproj_user(${_TEST_NAME})
