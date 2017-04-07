@@ -521,10 +521,19 @@ function(cmaki2_test)
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-	add_test(
-		NAME ${_TEST_NAME}_exe
-		COMMAND ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
-		WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	if (CMAKE_BUILD_TYPE STREQUAL "Release")
+		add_test(
+			NAME ${_TEST_NAME}_exe
+			COMMAND ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
+			COMMAND valgrind --tool=callgrind ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	else()
+		add_test(
+			NAME ${_TEST_NAME}_exe
+			COMMAND ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
+			COMMAND ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+	endif()
 	generate_vcxproj_user(${_TEST_NAME})
 
 endfunction()
