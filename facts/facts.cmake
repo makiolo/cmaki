@@ -522,6 +522,7 @@ function(cmaki2_test)
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 	if (CMAKE_BUILD_TYPE STREQUAL "Release")
+		message("-- Launch ${_TEST_NAME}_exe with valgrind")
 		add_test(
 			NAME ${_TEST_NAME}_exe
 			COMMAND valgrind --tool=callgrind ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
