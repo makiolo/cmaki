@@ -38,24 +38,21 @@ cd $CC/$MODE
 if [ -f "../../conanfile.txt" ]; then
 	conan install ../..
 fi
+if [ -f "../../CMakeCache.txt" ]; then
+	rm ../../CMakeCache.txt
+fi
 # setup
 cmake ../.. -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL -DCOVERAGE=$COVERAGE 
 # compile
-cmake --build . --config $MODE --target install -- -j8 -k || cmake --build . --config $MODE --target install -- -j1
-# pretests
-if [[ "$CC" == "gcc" ]]; then
-	if [[ "$MODE" == "Debug" ]]; then
-		# initial coverage
-		find ../.. -name "*.cpp" -o -name "*.h"
-		find ../.. -name "*.gcno" -o -name "*.gcda"
-		lcov -c -i -d ../.. -o coverage.base
-	fi
-fi
-# execute tests
+cmake --build . --config $MODE --target install -- -j8 -k VERBOSE=1 || cmake --build . --config $MODE --target install -- -j1 VERBOSE=1
+# tests
 ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
 # posttests
 if [[ "$CC" == "gcc" ]]; then
 	if [[ "$MODE" == "Debug" ]]; then
+		find ../.. -name "*.cpp" -o -name "*.h"
+		find ../.. -name "*.gcno" -o -name "*.gcda"
+		lcov -c -i -d ../.. -o coverage.base
 		# aggregate coverage
 		lcov -c -d ../.. -o coverage.run
 		# merge pre & run

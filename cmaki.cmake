@@ -147,6 +147,7 @@ function(cmaki_executable)
 	MESSAGE("++ executable ${_EXECUTABLE_NAME}")
 	source_group( "Source Files" FILES ${_SOURCES} )
 	common_flags()
+	common_linking(${_EXECUTABLE_NAME})
 	include_directories(.)
 	foreach(INCLUDE_DIR ${_INCLUDES})
 		target_include_directories(${_EXECUTABLE_NAME} ${INCLUDE_DIR})
@@ -163,7 +164,6 @@ function(cmaki_executable)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_EXECUTABLE_NAME} -lpthread)
 	endif()
-	common_linking(${_EXECUTABLE_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(    TARGETS ${_EXECUTABLE_NAME}
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
@@ -179,6 +179,7 @@ function(cmaki_library)
 	MESSAGE("++ library ${_LIBRARY_NAME}")
 	source_group( "Source Files" FILES ${_SOURCES} )
 	common_flags()
+	common_linking(${_LIBRARY_NAME})
 	include_directories(.)
 	foreach(INCLUDE_DIR ${_INCLUDES})
 		target_include_directories(${_LIBRARY_NAME} ${INCLUDE_DIR})
@@ -191,7 +192,6 @@ function(cmaki_library)
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_LIBRARY_NAME} -lpthread)
 	endif()
-	common_linking(${_LIBRARY_NAME})
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
 		INSTALL(	TARGETS ${_LIBRARY_NAME}
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
@@ -204,6 +204,8 @@ endfunction()
 function(cmaki_test)
 	cmaki_parse_parameters(${ARGV})
 	set(_TEST_NAME ${_MAIN_NAME})
+	common_flags()
+	common_linking(${_TEST_NAME})
 	MESSAGE("++ test ${_TEST_NAME}")
 	include_directories(.)
 	foreach(INCLUDE_DIR ${_INCLUDES})
@@ -222,24 +224,33 @@ function(cmaki_test)
 		INSTALL(    TARGETS ${_TEST_NAME}
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
-	endforeach()
-	if(WIN32)
-		add_test(
-			NAME ${_TEST_NAME}__
-			COMMAND ${_TEST_NAME}
-			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
-	else()
-		if (CMAKE_BUILD_TYPE STREQUAL "Release")
-			message("-- Launch ${_TEST_NAME}__ with valgrind")
+		if(WIN32)
 			add_test(
 				NAME ${_TEST_NAME}__
-				COMMAND valgrind --tool=callgrind ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}/${_TEST_NAME})
+				COMMAND ${_TEST_NAME}
+				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+				CONFIGURATIONS ${BUILD_TYPE}
+				)
 		else()
-			add_test(
-				NAME ${_TEST_NAME}__
-				COMMAND ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}/${_TEST_NAME})
+			if (BUILD_TYPE STREQUAL "Release")
+				message("-- Launch ${_TEST_NAME}__ with valgrind")
+				add_test(
+					NAME ${_TEST_NAME}__
+					# COMMAND valgrind --tool=callgrind ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}/${_TEST_NAME}
+					COMMAND ${_TEST_NAME}
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+			else()
+				add_test(
+					NAME ${_TEST_NAME}__
+					COMMAND ${_TEST_NAME}
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+			endif()
 		endif()
-	endif()
+	endforeach()
 	generate_vcxproj_user(${_TEST_NAME})
 	generate_clang()
 
@@ -251,29 +262,13 @@ macro(common_linking)
 	message("CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 	set(PARAMETERS ${ARGV})
 	list(GET PARAMETERS 0 TARGET)
-	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-		message("-- activate coverage")
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --coverage")
-	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --pg")
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		target_link_libraries(${TARGET} -lubsan)
-	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer -shared-libsan")
 	endif()
 
 endmacro()
 
 macro(common_flags)
-	# https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso
-	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --coverage")
-	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --pg")
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-	endif()
 
 	if(WIN32 AND (NOT MINGW) AND (NOT MSYS))
 		# c++ exceptions and RTTI
@@ -297,6 +292,27 @@ macro(common_flags)
 endmacro()
 
 macro(enable_modern_cpp)
+
+	# https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso
+	# flags
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --coverage")
+	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --pg")
+		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	endif()
+	# linker flags
+	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+		message("-- activate coverage")
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --pg")
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -fno-omit-frame-pointer -shared-libsan")
+	endif()
 
 	if(WIN32 AND (NOT MINGW) AND (NOT MSYS))
 		add_definitions(/EHsc)
