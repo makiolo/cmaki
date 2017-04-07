@@ -225,16 +225,24 @@ function(cmaki_test)
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-	IF(WIN32)
+	if(WIN32)
 		add_test(
 			NAME ${_TEST_NAME}__
 			COMMAND ${_TEST_NAME}
 			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
-	ELSE()
-		add_test(
-			NAME ${_TEST_NAME}__
-			COMMAND ${_TEST_NAME})
-	ENDIF()
+	else()
+		if (CMAKE_BUILD_TYPE STREQUAL "Release")
+			message("-- Launch ${_TEST_NAME}__ with valgrind")
+			add_test(
+				NAME ${_TEST_NAME}__
+				COMMAND valgrind --tool=callgrind ${_TEST_NAME}
+				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
+		else()
+			add_test(
+				NAME ${_TEST_NAME}__
+				COMMAND ${_TEST_NAME})
+		endif()
+	endif()
 	generate_vcxproj_user(${_TEST_NAME})
 	generate_clang()
 
