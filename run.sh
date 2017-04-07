@@ -38,16 +38,30 @@ cd $CC/$MODE
 if [ -f "../../conanfile.txt" ]; then
 	conan install ../..
 fi
+# setup
 cmake ../.. -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL -DCOVERAGE=$COVERAGE 
-# -DCOMPILER_RT_BUILD_SHARED_ASAN=ON
+# compile
 cmake --build . --config $MODE --target install -- -j8 -k || cmake --build . --config $MODE --target install -- -j1
-ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
+# pretests
 if [[ "$CC" == "gcc" ]]; then
 	if [[ "$MODE" == "Debug" ]]; then
-		# generate coverage reports in gcc Debug
-		lcov --directory . --capture --output-file coverage.info  # capture coverage info
-		lcov --remove coverage.info '/usr/*' --output-file coverage.info  # filter out system
-		lcov --list coverage.info  # debug info
+		# initial coverage
+		lcov -c -i -d ../.. -o coverage.base
+	fi
+fi
+# execute tests
+ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
+# posttests
+if [[ "$CC" == "gcc" ]]; then
+	if [[ "$MODE" == "Debug" ]]; then
+		# aggregate coverage
+		lcov -c -d ../.. -o coverage.run
+		# merge pre & run
+		lcov -d ../.. -a coverage.base -a coverage.run -o coverage.info
+		lcov -r coverage.info '/usr/*' -o coverage.info
+		lcov -l coverage.info
+		genhtml --no-branch-coverage -o coverage/ coverage.info
 		bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+		rm -f coverage.base coverage.run coverage.info
 	fi
 fi
