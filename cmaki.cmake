@@ -232,11 +232,10 @@ function(cmaki_test)
 				CONFIGURATIONS ${BUILD_TYPE}
 				)
 		else()
-			if (BUILD_TYPE STREQUAL "Release")
-				message("-- Launch ${_TEST_NAME}__ with valgrind")
+
+			if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 				find_program(VALGRIND "valgrind")
 				if(VALGRIND)
-					# add_custom_target(${_TEST_NAME}_memcheck COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}>)
 					add_test(
 						NAME ${_TEST_NAME}_memcheck
 						COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}>
@@ -267,6 +266,8 @@ function(cmaki_test)
 						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 						CONFIGURATIONS ${BUILD_TYPE}
 						)
+				else()
+					message(FATAL_ERROR "no valgrind detected")
 				endif()
 			else()
 				add_test(
