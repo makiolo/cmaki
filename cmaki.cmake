@@ -437,7 +437,9 @@ macro(enable_modern_cpp)
 	# https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso
 	# flags
 	if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
-		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --coverage")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -coverage")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-elide-constructors")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-inline")
 	elseif ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 		SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -pg")
 	# 	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
