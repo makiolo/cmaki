@@ -526,31 +526,31 @@ function(cmaki2_test)
 			if(VALGRIND)
 				add_test(
 					NAME ${_TEST_NAME}_memcheck
-					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_cachegrind
-					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_helgrind
-					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_callgrind
-					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_drd
-					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
@@ -560,7 +560,7 @@ function(cmaki2_test)
 		else()
 			add_test(
 				NAME ${_TEST_NAME}_test
-				COMMAND $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+				COMMAND $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
 				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 				CONFIGURATIONS ${BUILD_TYPE}
 				)
