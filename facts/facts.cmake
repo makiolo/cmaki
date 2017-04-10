@@ -505,7 +505,6 @@ function(cmaki2_test)
 	endif()
 	add_executable(${_TEST_NAME}_exe ${_SOURCES})
 	target_link_libraries(${_TEST_NAME}_exe ${_DEPENDS})
-	# echo_targets(${_TEST_NAME}_exe)
 	foreach(LIB_DIR ${CMAKI_LIBRARIES})
 		target_link_libraries(${_TEST_NAME}_exe ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
@@ -517,22 +516,56 @@ function(cmaki2_test)
 		target_link_libraries(${_TEST_NAME}_exe -lpthread)
 	endif()
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-		INSTALL(    TARGETS ${_TEST_NAME}_exe
-					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
-					CONFIGURATIONS ${BUILD_TYPE})
+		INSTALL(  	TARGETS ${_TEST_NAME}_exe
+				DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
+				CONFIGURATIONS ${BUILD_TYPE})
+				
+		#  --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
+		if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+			find_program(VALGRIND "valgrind")
+			if(VALGRIND)
+				add_test(
+					NAME ${_TEST_NAME}_memcheck
+					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+				add_test(
+					NAME ${_TEST_NAME}_cachegrind
+					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+				add_test(
+					NAME ${_TEST_NAME}_helgrind
+					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+				add_test(
+					NAME ${_TEST_NAME}_callgrind
+					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+				add_test(
+					NAME ${_TEST_NAME}_drd
+					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+					CONFIGURATIONS ${BUILD_TYPE}
+					)
+			else()
+				message(FATAL_ERROR "no valgrind detected")
+			endif()
+		else()
+			add_test(
+				NAME ${_TEST_NAME}_test
+				COMMAND $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=info
+				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+				CONFIGURATIONS ${BUILD_TYPE}
+				)
+		endif()
 	endforeach()
-	if (CMAKE_BUILD_TYPE STREQUAL "Release")
-		message("-- Launch ${_TEST_NAME}_exe with valgrind")
-		add_test(
-			NAME ${_TEST_NAME}_exe
-			COMMAND valgrind --tool=callgrind ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
-			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
-	else()
-		add_test(
-			NAME ${_TEST_NAME}_exe
-			COMMAND ${_TEST_NAME}_exe --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
-			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE})
-	endif()
 	generate_vcxproj_user(${_TEST_NAME})
 
 endfunction()
