@@ -557,14 +557,13 @@ function(cmaki2_test)
 			else()
 				message(FATAL_ERROR "no valgrind detected")
 			endif()
-		else()
-			add_test(
-				NAME ${_TEST_NAME}_test
-				COMMAND $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
-				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
-				CONFIGURATIONS ${BUILD_TYPE}
-				)
 		endif()
+		add_test(
+			NAME ${_TEST_NAME}_test
+			COMMAND $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
+			CONFIGURATIONS ${BUILD_TYPE}
+			)
 	endforeach()
 	generate_vcxproj_user(${_TEST_NAME})
 
@@ -593,7 +592,7 @@ macro(cmaki_boost_python_test)
 	cmaki_find_package(boost-python)
 	cmaki2_gtest(${ARGV} PTHREADS)
 	cmaki_parse_parameters(${ARGV})
-	set_tests_properties(${_MAIN_NAME}_exe PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}")
+	set_tests_properties(${_MAIN_NAME}_test PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_INSTALL_PREFIX}/${CMAKE_BUILD_TYPE}")
 endmacro()
 
 macro(cmaki_python_test)
