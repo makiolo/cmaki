@@ -17,7 +17,6 @@ ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
 # posttests
 if [[ "$CC" == "gcc" ]]; then
 	if [[ "$MODE" == "Debug" ]]; then
-		find ../.. -name "*.cpp" -o -name "*.h"
 		find ../.. -name "*.gcno" -o -name "*.gcda"
 		lcov -c -i -d ../.. -o coverage.base
 		# aggregate coverage
@@ -26,7 +25,9 @@ if [[ "$CC" == "gcc" ]]; then
 		lcov -d ../.. -a coverage.base -a coverage.run -o coverage.info
 		lcov -r coverage.info '/usr/*' -o coverage.info
 		lcov -r coverage.info 'tests/*' -o coverage.info
-		lcov -l coverage.info
+		lcov -r coverage.info 'gtest/*' -o coverage.info
+		lcov -r coverage.info 'gmock/*' -o coverage.info
+		# lcov -l coverage.info
 		genhtml --no-branch-coverage -o ../../coverage/ coverage.info
 		bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 		rm -f coverage.base coverage.run coverage.info
