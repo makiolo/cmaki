@@ -58,6 +58,7 @@ if [[ "$CC" == "gcc" ]]; then
 		# merge pre & run
 		lcov -d ../.. -a coverage.base -a coverage.run -o coverage.info
 		lcov -r coverage.info '/usr/*' -o coverage.info
+		lcov -r coverage.info 'tests/*' -o coverage.info
 		lcov -l coverage.info
 		genhtml --no-branch-coverage -o ../../coverage/ coverage.info
 		bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
