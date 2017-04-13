@@ -2,6 +2,7 @@
 set -e
 NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
+NOCODECOV="${NOCODECOV:-FALSE}"
 # export CC="${CC:-clang}"
 # export CXX="${CXX:-clang++}"
 export CC="${CC:-gcc}"
@@ -29,7 +30,9 @@ if [[ "$CC" == "gcc" ]]; then
 		lcov -r coverage.info 'gmock/*' -o coverage.info
 		# lcov -l coverage.info
 		genhtml --no-branch-coverage -o ../../coverage/ coverage.info
-		bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+		if [ "$NOCODECOV" == "FALSE" ]; then
+			bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+		fi
 		rm -f coverage.base coverage.run coverage.info
 	fi
 fi
