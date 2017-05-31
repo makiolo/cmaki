@@ -46,16 +46,8 @@ elif [ "${OS}" = "Linux" ] ; then
 fi
 
 if [ "${CC}" = "UNDEFINED" ]; then
-	if [ "${MODE}" = "UNDEFINED" ]; then
-		echo "${OSSTR}"
-	else
-		echo "${OSSTR}_${MODE}"
-	fi
+	echo "${OSSTR}"
 else
-	if [ "${MODE}" = "UNDEFINED" ]; then
-		echo "${OSSTR}_${CC}"
-	else
-		echo "${OSSTR}_${CC}_${MODE}"
-	fi
+	echo "${OSSTR}_${CC}"
 fi
 
