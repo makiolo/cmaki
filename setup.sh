@@ -1,28 +1,13 @@
 #!/bin/bash
 set -e
-NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
-NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
-# export CC="${CC:-clang}"
-# export CXX="${CXX:-clang++}"
+export NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
+export NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
 export CC="${CC:-gcc}"
 export CXX="${CXX:-g++}"
 export MODE=${MODE:-Debug}
 
-if [[ "$OSTYPE" == "cygwin" ]]; then
-	PATH=$(cygpath "E:\dev\gtc1\bin\cmake-3.4.3-win32-x86\bin"):$PATH
-	GENERATOR="MinGW Makefiles"
-	CC=mingw32-gcc
-	CXX=mingw32-g++
-else
-	GENERATOR="Unix Makefiles"
-fi
+GENERATOR="Unix Makefiles"
 
-# coverage in debug
-if [[ "$COVERAGE" == "Debug" ]]; then
-	COVERAGE=TRUE
-else
-	COVERAGE=FALSE
-fi
 if [ -d cmaki ]; then
 	(cd cmaki && git pull origin master)
 fi
@@ -42,5 +27,5 @@ if [ -f "../../CMakeCache.txt" ]; then
 	rm ../../CMakeCache.txt
 fi
 # setup
-cmake ../.. -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL -DCOVERAGE=$COVERAGE 
+cmake ../.. -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL
 
