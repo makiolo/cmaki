@@ -5,8 +5,8 @@
 OS=`uname -s`
 REV=`uname -r`
 MACH=`uname -m`
-MODE="${MODE:-UNDEFINED}"
-CC="${CC:-UNDEFINED}"
+MODE="${MODE:-Debug}"
+CC="${CC:-gcc}"
 CC=$(basename $CC)
 OSSTR=$(uname | tr "[:upper:]" "[:lower:]")
 if [ "${OS}" = "SunOS" ] ; then
@@ -45,16 +45,5 @@ elif [ "${OS}" = "Linux" ] ; then
 	OSSTR="${OS}_${DIST}_${REV}${PSUEDONAME}${MACH}"
 fi
 
-if [ "${CC}" = "UNDEFINED" ]; then
-	if [ "${MODE}" = "UNDEFINED" ]; then
-		echo "${OSSTR}"
-	else
-		echo "${OSSTR}_${MODE}"
-	fi
-else
-	if [ "${MODE}" = "UNDEFINED" ]; then
-		echo "${OSSTR}_${CC}"
-	else
-		echo "${OSSTR}_${CC}_${MODE}"
-	fi
-fi
+echo "${OSSTR}_${CC}_${MODE}"
+
