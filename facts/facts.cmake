@@ -521,7 +521,7 @@ function(cmaki2_test)
 				CONFIGURATIONS ${BUILD_TYPE})
 				
 		#  --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
-		if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		if (DEFINED VALGRIND_BUILD AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 			find_program(VALGRIND "valgrind")
 			if(VALGRIND)
 				add_test(
