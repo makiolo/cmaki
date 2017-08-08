@@ -8,15 +8,15 @@ export MODE=${MODE:-Debug}
 
 GENERATOR="Unix Makefiles"
 
-if [ -d cmaki ]; then
-	(cd cmaki && git pull origin master)
-fi
-if [ -d cmaki_generator ]; then
-	(cd cmaki_generator && git pull origin master)
-fi
-if [ -d metacommon ]; then
-	(cd metacommon && git pull origin master)
-fi
+# if [ -d cmaki ]; then
+# 	(cd cmaki && git pull origin master)
+# fi
+# if [ -d cmaki_generator ]; then
+# 	(cd cmaki_generator && git pull origin master)
+# fi
+# if [ -d metacommon ]; then
+# 	(cd metacommon && git pull origin master)
+# fi
 echo "running in mode $MODE ... ($CC / $CXX)"
 mkdir -p $CC/$MODE
 cd $CC/$MODE
