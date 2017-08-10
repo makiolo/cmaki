@@ -14,6 +14,8 @@ macro(cmaki_setup)
 		include(${CMAKE_CURRENT_LIST_DIR}/build/conanbuildinfo.cmake)
 		conan_basic_setup()
 	endif()
+	include_directories(.)
+	include_directories(node_modules)
 endmacro()
 
 macro (mark_as_internal _var)
