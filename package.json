@@ -1,21 +1,85 @@
 {
-  "name": "cmaki",
-  "version": "1.0.1",
-  "description": "artifacts consumer",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/makiolo/cmaki.git"
+  "_args": [
+    [
+      {
+        "raw": "cmaki@^1.0.1",
+        "scope": null,
+        "escapedName": "cmaki",
+        "name": "cmaki",
+        "rawSpec": "^1.0.1",
+        "spec": ">=1.0.1 <2.0.0",
+        "type": "range"
+      },
+      "E:\\dev\\design-patterns-cpp14"
+    ]
+  ],
+  "_from": "cmaki@>=1.0.1 <2.0.0",
+  "_id": "cmaki@1.0.1",
+  "_inCache": true,
+  "_location": "/cmaki",
+  "_nodeVersion": "4.2.6",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/cmaki-1.0.1.tgz_1502392594706_0.17891717422753572"
   },
+  "_npmUser": {
+    "name": "makiolo",
+    "email": "makiolo@gmail.com"
+  },
+  "_npmVersion": "3.5.2",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "cmaki@^1.0.1",
+    "scope": null,
+    "escapedName": "cmaki",
+    "name": "cmaki",
+    "rawSpec": "^1.0.1",
+    "spec": ">=1.0.1 <2.0.0",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cmaki/-/cmaki-1.0.1.tgz",
+  "_shasum": "2d1d69c5f37d5569aeac7dca58cece77d4606f91",
+  "_shrinkwrap": null,
+  "_spec": "cmaki@^1.0.1",
+  "_where": "E:\\dev\\design-patterns-cpp14",
+  "author": {
+    "name": "Ricardo Marmolejo García"
+  },
+  "bugs": {
+    "url": "https://github.com/makiolo/cmaki/issues"
+  },
+  "dependencies": {},
+  "description": "artifacts consumer",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "2d1d69c5f37d5569aeac7dca58cece77d4606f91",
+    "tarball": "https://registry.npmjs.org/cmaki/-/cmaki-1.0.1.tgz"
+  },
+  "gitHead": "aeb226299bc18428aeb87d5e6121af607bdb598e",
+  "homepage": "https://github.com/makiolo/cmaki#readme",
   "keywords": [
     "cmake",
     "c++",
     "artifacts"
   ],
-  "author": "Ricardo Marmolejo García",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/makiolo/cmaki/issues"
+  "maintainers": [
+    {
+      "name": "makiolo",
+      "email": "makiolo@gmail.com"
+    }
+  ],
+  "name": "cmaki",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makiolo/cmaki.git"
   },
-  "homepage": "https://github.com/makiolo/cmaki#readme"
+  "scripts": {},
+  "version": "1.0.1"
 }
-

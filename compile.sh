@@ -12,3 +12,4 @@ cd $CC/$MODE
 
 # compile
 cmake --build . --config $MODE --target install -- -j8 -k VERBOSE=1 || cmake --build . --config $MODE --target install -- -j1 VERBOSE=1
+

@@ -14,6 +14,7 @@ cd $CC/$MODE
 
 # tests
 ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
+
 # posttests
 if [ "$NOCOVERAGE" == "FALSE" ]; then
 	if [[ "$CC" == "gcc" ]]; then
@@ -37,3 +38,4 @@ if [ "$NOCOVERAGE" == "FALSE" ]; then
 		fi
 	fi
 fi
+
