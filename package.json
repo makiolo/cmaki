@@ -1,0 +1,21 @@
+{
+  "name": "cmaki",
+  "version": "1.0.0",
+  "description": "artifacts consumer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makiolo/cmaki.git"
+  },
+  "keywords": [
+    "cmake",
+    "c++",
+    "artifacts"
+  ],
+  "author": "Ricardo Marmolejo García",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/makiolo/cmaki/issues"
+  },
+  "homepage": "https://github.com/makiolo/cmaki#readme"
+}
+
