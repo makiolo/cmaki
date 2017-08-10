@@ -17,7 +17,6 @@ md %MODE%
 cd %MODE%
 
 :: setup
-dir
 cmake .. -DCMAKE_BUILD_TYPE=%MODE% -DFIRST_ERROR=1 -G"%GENERATOR%"
 cd ..
 
