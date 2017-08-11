@@ -1,5 +1,5 @@
 @echo off
-call cmaki\setup.cmd
-call cmaki\compile.cmd
-call cmaki\tests.cmd
+call node_modules\cmaki\setup.cmd
+call node_modules\cmaki\compile.cmd
+call node_modules\cmaki\tests.cmd
 

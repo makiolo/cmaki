@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-./cmaki/clean.sh
-./cmaki/setup.sh
-./cmaki/compile.sh
+./node_modules/cmaki/clean.sh
+./node_modules/cmaki/setup.sh
+./node_modules/cmaki/compile.sh
 

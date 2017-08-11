@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-./cmaki/setup.sh
-./cmaki/compile.sh
-./cmaki/tests.sh
+./node_modules/cmaki/setup.sh
+./node_modules/cmaki/compile.sh
+./node_modules/cmaki/tests.sh
 
