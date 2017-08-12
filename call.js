@@ -1,38 +1,47 @@
 var os = require('os')
 var fs = require('fs');
 var path = require('path')
-var exec = require('child_process').exec;
+var exec = require('shelljs').exec;
 
-var err_code = 0;
+function trim(s)
+{
+	return ( s || '' ).replace( /^\s+|\s+$/g, '' );
+}
+
 var is_win = (os.platform() === 'win32');
 var dir_script = path.dirname( process.argv[1] );
-var script_array = process.argv[2].split(",");
-script_array.forEach(function(script) {
+var script = process.argv[2];
 
-	if (is_win)
-	{
-		script_execute = path.join(dir_script, script+".cmd");
-		exists = fs.existsSync(script_execute)
-		caller_execute = "cmd /c "
-		script_execute = script_execute.replace(/\//g, "\\");
-	}
-	else
-	{
-		script_execute = path.join(dir_script, script+".sh");
-		exists = fs.existsSync(script_execute)
-		caller_execute = "bash "
-		script_execute = script_execute.replace(/\\/g, "/");
-	}
+if (is_win)
+{
+	script_execute = path.join(dir_script, script+".cmd");
+	exists = fs.existsSync(script_execute)
+	caller_execute = "cmd /c "
+	script_execute = script_execute.replace(/\//g, "\\");
+}
+else
+{
+	script_execute = path.join(dir_script, script+".sh");
+	exists = fs.existsSync(script_execute)
+	caller_execute = "bash "
+	script_execute = script_execute.replace(/\\/g, "/");
+}
 
-	if(exists)
-	{
-		console.log("running: " + script_execute);
-		exec(caller_execute + script_execute, function(p, o, e) { console.log(o); });
-	}
-	else
-	{
-		console.log("[error] dont exits: " + script_execute);
-	}
-
-});
+if(exists)
+{
+	var child = exec(caller_execute + script_execute, {async:true, silent:true}, function(err, stdout, stderr) {
+		console.log("salida node: "+err);
+		process.exit(err);
+	});
+	child.stdout.on('data', function(data) {
+		console.log(trim(data));
+	});
+	child.stdout.on('exit', function(err) {
+		console.log("exit: " + err);
+	});
+}
+else
+{
+	console.log("[error] dont exits: " + script_execute);
+}
 

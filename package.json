@@ -16,6 +16,8 @@
   "bugs": {
     "url": "https://github.com/makiolo/cmaki/issues"
   },
-  "homepage": "https://github.com/makiolo/cmaki#readme"
+  "homepage": "https://github.com/makiolo/cmaki#readme",
+  "dependencies": {
+    "shelljs": "^0.7.8"
+  }
 }
-
