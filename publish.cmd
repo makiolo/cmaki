@@ -1,3 +1,3 @@
-#!/bin/bash
+@echo off
 git push && npm publish
 
