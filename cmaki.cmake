@@ -15,6 +15,7 @@ macro(cmaki_setup)
 		conan_basic_setup()
 	endif()
 	include_directories(.)
+	include_directories(..)
 	include_directories(node_modules)
 endmacro()
 
