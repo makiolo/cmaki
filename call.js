@@ -35,6 +35,9 @@ if(exists)
 	child.stdout.on('data', function(data) {
 		console.log(trim(data));
 	});
+	child.stderr.on('data', function(data) {
+		console.log(trim(data));
+	});
 }
 else
 {
