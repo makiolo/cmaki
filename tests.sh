@@ -3,7 +3,7 @@ set -e
 NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
 NOCODECOV="${NOCODECOV:-FALSE}"
-NOCOVERAGE="${NOCOVERAGE:-FALSE}"
+COVERAGE="${COVERAGE:-FALSE}"
 export CC="${CC:-gcc}"
 export CXX="${CXX:-g++}"
 export MODE=${MODE:-Debug}
@@ -16,7 +16,7 @@ cd $CC/$MODE
 ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
 
 # posttests
-if [ "$NOCOVERAGE" == "FALSE" ]; then
+if [ "$COVERAGE" == "TRUE" ]; then
 	if [[ "$CC" == "gcc" ]]; then
 		if [[ "$MODE" == "Debug" ]]; then
 			find ../.. -name "*.gcno" -o -name "*.gcda"
