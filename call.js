@@ -30,14 +30,10 @@ else
 if(exists)
 {
 	var child = exec(caller_execute + script_execute, {async:true, silent:true}, function(err, stdout, stderr) {
-		console.log("salida node: "+err);
 		process.exit(err);
 	});
 	child.stdout.on('data', function(data) {
 		console.log(trim(data));
-	});
-	child.stdout.on('exit', function(err) {
-		console.log("exit: " + err);
 	});
 }
 else
