@@ -569,7 +569,7 @@ function(cmaki2_test)
 		endif()
 		add_test(
 			NAME ${_TEST_NAME}_test
-			COMMAND $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+			COMMAND $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 			WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 			CONFIGURATIONS ${BUILD_TYPE}
 			)
