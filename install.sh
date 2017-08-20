@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-NODE_PATH="${NODE_PATH:-$PWD}"
-$NODE_PATH/node_modules/cmaki/clean.sh
-$NODE_PATH/node_modules/cmaki/setup.sh
-$NODE_PATH/node_modules/cmaki/compile.sh
+CMAKI_PWD="${CMAKI_PWD:-$PWD}"
+$CMAKI_PWD/node_modules/cmaki/clean.sh
+$CMAKI_PWD/node_modules/cmaki/setup.sh
+$CMAKI_PWD/node_modules/cmaki/compile.sh
 
