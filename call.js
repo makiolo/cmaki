@@ -4,8 +4,6 @@ var fs = require('fs');
 var path = require('path')
 var exec = require('shelljs').exec;
 
-env['NODE_PATH'] = __dirname + '/../..';
-
 function trim(s)
 {
 	return ( s || '' ).replace( /^\s+|\s+$/g, '' );
