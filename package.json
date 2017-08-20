@@ -1,13 +1,13 @@
 {
   "name": "cmaki",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "artifacts consumer",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/makiolo/cmaki.git"
   },
   "bin": {
-	"call": "node ./call.js"
+	"call": "./call.js"
   },
   "keywords": [
     "cmake",
