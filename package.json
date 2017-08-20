@@ -1,6 +1,6 @@
 {
   "name": "cmaki",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "artifacts consumer",
   "repository": {
     "type": "git",
@@ -11,7 +11,8 @@
 	"install.sh": "./install.sh",
 	"clean.sh": "./clean.sh",
 	"setup.sh": "./setup.sh",
-	"compile.sh": "./compile.sh"
+	"compile.sh": "./compile.sh",
+	"tests.sh": "./tests.sh"
   },
   "keywords": [
     "cmake",
