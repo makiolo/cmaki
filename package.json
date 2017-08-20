@@ -1,13 +1,17 @@
 {
   "name": "cmaki",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "artifacts consumer",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/makiolo/cmaki.git"
   },
   "bin": {
-	"call": "./call.js"
+	"call": "./call.js",
+	"install.sh": "./install.sh",
+	"clean.sh": "./clean.sh",
+	"setup.sh": "./setup.sh",
+	"compile.sh": "./compile.sh"
   },
   "keywords": [
     "cmake",
