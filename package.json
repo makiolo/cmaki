@@ -1,6 +1,6 @@
 {
   "name": "cmaki",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "artifacts consumer",
   "repository": {
     "type": "git",
@@ -8,11 +8,14 @@
   },
   "bin": {
 	"call": "./call.js",
+	"init.sh": "./init.sh",
 	"install.sh": "./install.sh",
 	"clean.sh": "./clean.sh",
 	"setup.sh": "./setup.sh",
 	"compile.sh": "./compile.sh",
-	"tests.sh": "./tests.sh"
+	"tests.sh": "./tests.sh",
+	"upload.sh": "./upload.sh",
+	"upload_all.sh": "./upload_all.sh"
   },
   "keywords": [
     "cmake",
