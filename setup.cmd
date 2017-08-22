@@ -15,8 +15,8 @@ if "%Platform%" == "x64" (
 echo running in mode %MODE% ...
 if exist %MODE% (rmdir /s /q %MODE%)
 md %MODE%
-cd %MODE%
 
 :: setup
+cd %MODE%
 cmake .. -DCMAKE_BUILD_TYPE=%MODE% -DFIRST_ERROR=1 -G"%GENERATOR%"
 cd ..
