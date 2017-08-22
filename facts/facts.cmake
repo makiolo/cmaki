@@ -248,22 +248,22 @@ function(cmaki_find_package PACKAGE)
 		find_package(${PACKAGE} ${VERSION} REQUIRED)
 	endif()
 
-	# 13 aÃ±adir los includes
+	# 13 add includes
 	string(TOUPPER "${PACKAGE}" PACKAGE_UPPER)
 	foreach(INCLUDE_DIR ${${PACKAGE_UPPER}_INCLUDE_DIRS})
 		list(APPEND CMAKI_INCLUDE_DIRS "${INCLUDE_DIR}")
 	endforeach()
 
-	# 14. añadir los libdir
+	# 14. add libdirs
 	foreach(LIB_DIR ${${PACKAGE_UPPER}_LIBRARIES})
 		list(APPEND CMAKI_LIBRARIES "${LIB_DIR}")
 	endforeach()
 
-	# 15. aÃ±adir variables especificas
+	# 15. add vers specific
 	set(${PACKAGE_UPPER}_INCLUDE_DIRS "${${PACKAGE_UPPER}_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(${PACKAGE_UPPER}_LIBRARIES "${${PACKAGE_UPPER}_LIBRARIES}" PARENT_SCOPE)
 
-	# 16. aÃ±aadir variabes generales
+	# 16. add vars globals
 	set(CMAKI_INCLUDE_DIRS "${CMAKI_INCLUDE_DIRS}" PARENT_SCOPE)
 	set(CMAKI_LIBRARIES "${CMAKI_LIBRARIES}" PARENT_SCOPE)
 
@@ -414,9 +414,6 @@ function(cmaki2_executable)
 		target_link_libraries(${_EXECUTABLE_NAME} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
 	endforeach()
-	if(CONAN_LIBS)
-		target_link_libraries(${_EXECUTABLE_NAME} ${CONAN_LIBS})
-	endif()
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_EXECUTABLE_NAME} -lpthread)
 	endif()
@@ -450,9 +447,6 @@ function(cmaki2_library)
 		target_link_libraries(${_LIBRARY_NAME} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
 	endforeach()
-	if(CONAN_LIBS)
-		target_link_libraries(${_LIBRARY_NAME} ${CONAN_LIBS})
-	endif()
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_LIBRARY_NAME} -lpthread)
 	endif()
@@ -486,9 +480,6 @@ function(cmaki2_static_library)
 		target_link_libraries(${_LIBRARY_NAME} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
 	endforeach()
-	if(CONAN_LIBS)
-		target_link_libraries(${_LIBRARY_NAME} ${CONAN_LIBS})
-	endif()
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_LIBRARY_NAME} -lpthread)
 	endif()
@@ -497,7 +488,6 @@ function(cmaki2_static_library)
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-
 endfunction()
 
 function(cmaki2_test)
@@ -518,9 +508,6 @@ function(cmaki2_test)
 		target_link_libraries(${_TEST_NAME}_exe ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
 	endforeach()
-	if(CONAN_LIBS)
-		target_link_libraries(${_TEST_NAME}_exe ${CONAN_LIBS})
-	endif()
 	if(HAVE_PTHREADS)
 		target_link_libraries(${_TEST_NAME}_exe -lpthread)
 	endif()
@@ -528,7 +515,6 @@ function(cmaki2_test)
 		INSTALL(  	TARGETS ${_TEST_NAME}_exe
 				DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 				CONFIGURATIONS ${BUILD_TYPE})
-				
 		#  --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
 		if (DEFINED VALGRIND_BUILD AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 			find_program(VALGRIND "valgrind")
