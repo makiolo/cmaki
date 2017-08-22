@@ -13,9 +13,4 @@ if "%Platform%" == "x64" (
 )
 
 echo running in mode %MODE% ...
-md %MODE%
-cd %MODE%
-
-ctest . --no-compress-output --output-on-failure -T Test -C %MODE% -V
-cd ..
-
+ctest %MODE% --no-compress-output --output-on-failure -T Test -C %MODE% -V
