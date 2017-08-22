@@ -13,10 +13,4 @@ if "%Platform%" == "x64" (
 )
 
 echo running in mode %MODE% ...
-if exist %MODE% (rmdir /s /q %MODE%)
-md %MODE%
-cd %MODE%
-
-:: compile
-cmake --build . --config %MODE% --target install
-cd ..
+cmake --build %MODE% --config %MODE% --target install
