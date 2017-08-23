@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
 export CC="${CC:-gcc}"
