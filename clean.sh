@@ -4,4 +4,3 @@ rm -Rf bin
 rm -Rf coverage
 rm -Rf gcc
 rm -Rf clang
-
