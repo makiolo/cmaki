@@ -2,6 +2,7 @@
 
 echo [0/3] preinstall
 set CMAKI_PWD=%CD%
+env | sort
 
 pip install pyyaml
 if %errorlevel% neq 0 exit /b %errorlevel%
