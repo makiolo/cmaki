@@ -1,5 +1,7 @@
 @echo off
 
+env | sort
+
 IF DEFINED CMAKI_PWD (
   set CMAKI_PWD=%CMAKI_PWD%
 ) ELSE (
