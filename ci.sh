@@ -3,6 +3,7 @@ set -e
 
 echo [0/3] preinstall
 export CMAKI_PWD=$(pwd)
+env | sort
 pip install --user pyyaml
 pip install --user poster
 pip install --user codecov
