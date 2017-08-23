@@ -45,3 +45,8 @@ if exist "cmaki.yml" (
   # IDEA: interesting autogenerate cmaki.yml from package.json
   echo TODO: generate artifact and upload with cmaki_generator
 )
+
+if exist "node_modules/.bin" (
+  echo list npm bin
+  dir node_modules/.bin
+)
