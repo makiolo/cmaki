@@ -14,6 +14,7 @@ cd $CC/$MODE
 
 # tests
 ctest . --no-compress-output --output-on-failure -T Test -C $MODE -V
+code=$?
 
 # posttests
 if [ "$COVERAGE" == "TRUE" ]; then
@@ -39,3 +40,4 @@ if [ "$COVERAGE" == "TRUE" ]; then
 	fi
 fi
 
+exit $code
