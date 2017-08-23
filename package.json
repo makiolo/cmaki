@@ -10,17 +10,17 @@
 	"cmaki": "./cmaki.js",
 	"init.sh": "./init.sh",
 	"install.sh": "./install.sh",
-	"install.cmd": "install.cmd",
+	"install.cmd": ".\install.cmd",
 	"clean.sh": "./clean.sh",
-	"clean.cmd": "clean.cmd",
+	"clean.cmd": ".\clean.cmd",
 	"setup.sh": "./setup.sh",
-	"setup.cmd": "setup.cmd",
+	"setup.cmd": ".\setup.cmd",
 	"compile.sh": "./compile.sh",
-	"compile.cmd": "./compile.cmd",
+	"compile.cmd": ".\compile.cmd",
 	"tests.sh": "./tests.sh",
-	"tests.cmd": "tests.cmd",
+	"tests.cmd": ".\tests.cmd",
 	"upload.sh": "./upload.sh",
-	"upload.cmd": "upload.cmd"
+	"upload.cmd": ".\upload.cmd"
   },
   "keywords": [
     "cmake",
