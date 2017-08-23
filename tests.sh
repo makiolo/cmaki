@@ -1,11 +1,11 @@
 #!/bin/bash
-NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
-NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
-NOCODECOV="${NOCODECOV:-FALSE}"
-COVERAGE="${COVERAGE:-FALSE}"
+export NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
+export NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
+export NOCODECOV="${NOCODECOV:-FALSE}"
+export COVERAGE="${COVERAGE:-FALSE}"
 export CC="${CC:-gcc}"
 export CXX="${CXX:-g++}"
-export MODE=${MODE:-Debug}
+export MODE="${MODE:-Debug}"
 
 echo "running in mode $MODE ... ($CC / $CXX)"
 mkdir -p $CC/$MODE
