@@ -1,7 +1,4 @@
 @echo off
-rd /s /q node_modules\depends
-rd /s /q bin
-rd /s /q coverage
-rd /s /q gcc
-rd /s /q clang
-
+rd /s /q node_modules 2> NUL
+rd /s /q bin 2> NUL
+rd /s /q coverage 2> NUL
