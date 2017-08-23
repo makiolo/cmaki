@@ -20,7 +20,7 @@
 	"tests.sh": "./tests.sh",
 	"tests.cmd": "tests.cmd",
 	"upload.sh": "./upload.sh",
-	"upload.cmd": "upload.cmd",
+	"upload.cmd": "upload.cmd"
   },
   "keywords": [
     "cmake",
