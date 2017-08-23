@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
+echo [0/3] preinstall
 export CMAKI_PWD=$(pwd)
-
 pip install --user pyyaml
 pip install --user poster
 pip install --user codecov
@@ -30,6 +30,7 @@ else
 fi
 
 if [ -f "cmaki.yml" ]; then
+  echo [4/3] upload artifact
   # IDEA: interesting autogenerate cmaki.yml from package.json
   echo TODO: generate artifact and upload with cmaki_generator
 fi
