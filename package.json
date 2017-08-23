@@ -7,7 +7,7 @@
     "url": "git+https://github.com/makiolo/cmaki.git"
   },
   "bin": {
-	"cmaki": "node cmaki.js",
+	"cmaki": "./cmaki.js",
 	"init.sh": "./init.sh",
 	"install.sh": "./install.sh",
 	"install.cmd": "./install.cmd",
