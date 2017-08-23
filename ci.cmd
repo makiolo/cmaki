@@ -12,8 +12,8 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 if exist package.json (
   
   echo [1/3] prepare
-  npm install npm-check-updates
-  call node_modules\.bin\ncu -u
+  npm install -g npm-check-updates
+  call ncu -u
   
   echo [2/3] compile
   npm install
