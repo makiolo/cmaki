@@ -13,5 +13,9 @@ if "%Platform%" == "x64" (
 )
 
 echo running in mode %MODE% ...
-cmake --build %MODE% --config %MODE% --target install
-if %errorlevel% neq 0 exit /b %errorlevel%
+cd %MODE%
+cmake --build . --config %MODE% --target install
+set lasterror=%errorlevel%
+cd ..
+
+if %lasterror% neq 0 exit /b %lasterror%
