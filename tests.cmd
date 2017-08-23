@@ -13,4 +13,9 @@ if "%Platform%" == "x64" (
 )
 
 echo running in mode %MODE% ...
-ctest %MODE% --no-compress-output --output-on-failure -T Test -C %MODE% -V
+cd %MODE%
+ctest . --no-compress-output --output-on-failure -T Test -C %MODE% -V
+set lasterror=%errorlevel%
+cd ..
+
+if %lasterror% neq 0 exit /b %lasterror%
