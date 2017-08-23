@@ -8,8 +8,8 @@ pip install --user poster
 pip install --user codecov
 
 if [ -f "package.json" ]; then
-  npm install -g npm-check-updates
-  ncu -u
+  npm install npm-check-updates
+  ./node_modules/.bin/ncu -u
   npm install
   npm test
 else
