@@ -6,17 +6,19 @@ export CC="${CC:-gcc}"
 export CXX="${CXX:-g++}"
 export MODE=${MODE:-Debug}
 export CMAKI_INSTALL=${CMAKI_INSTALL:-$CMAKI_PWD/bin}
-
-GENERATOR="Unix Makefiles"
+export CMAKI_GENERATOR=${CMAKI_GENERATOR:-"Unix Makefiles"}
 
 echo "running in mode $MODE ... ($CC / $CXX)"
-mkdir -p $CC/$MODE
-cd $CC/$MODE
-if [ -f "../../CMakeCache.txt" ]; then
-	rm ../../CMakeCache.txt
+if [ -f "CMakeCache.txt" ]; then
+	rm CMakeCache.txt
 fi
+if [ -d $CC/$MODE ]; then
+	rm -Rf $CC/$MODE
+fi
+mkdir -p $CC/$MODE
 
 # setup
-cmake ../.. -DCMAKE_INSTALL_PREFIX=$CMAKI_INSTALL -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL
+cd $CC/$MODE
+cmake ../.. -DCMAKE_INSTALL_PREFIX=$CMAKI_INSTALL -DCMAKE_BUILD_TYPE=$MODE -DFIRST_ERROR=1 -G"$CMAKI_GENERATOR" -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX" -DNOCACHE_REMOTE=$NOCACHE_REMOTE -DNOCACHE_LOCAL=$NOCACHE_LOCAL
 code=$?
 exit $code
