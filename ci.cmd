@@ -2,6 +2,7 @@
 
 echo [0/3] preinstall
 set CMAKI_PWD=%CD%
+set PATH=%CMAKI_PWD%\node_modules\cmaki;%PATH%
 env | sort
 
 pip install pyyaml
@@ -47,7 +48,7 @@ if exist "cmaki.yml" (
   echo TODO: generate artifact and upload with cmaki_generator
 )
 
-if exist "node_modules/.bin" (
-  echo list npm bin
-  dir node_modules/.bin
+if exist "node_modules" (
+  echo list npm
+  dir node_modules
 )
