@@ -14,3 +14,4 @@ if "%Platform%" == "x64" (
 
 echo running in mode %MODE% ...
 cmake --build %MODE% --config %MODE% --target install
+if %errorlevel% neq 0 exit /b %errorlevel%
