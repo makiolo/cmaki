@@ -1,5 +1,6 @@
 @echo off
 
+echo [0/3] preinstall
 set CMAKI_PWD=%CD%
 
 pip install pyyaml
@@ -39,4 +40,8 @@ if exist package.json (
 
 )
 
-# TODO: upload artifact
+if exist "cmaki.yml" (
+  echo [4/3] upload artifact
+  # IDEA: interesting autogenerate cmaki.yml from package.json
+  echo TODO: generate artifact and upload with cmaki_generator
+)
