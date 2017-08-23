@@ -36,5 +36,6 @@ if [ -f "cmaki.yml" ]; then
 fi
 
 if [ -d "node_modules/.bin" ]; then
+  echo list npm bin
   ls -ltr node_modules/.bin
 fi
