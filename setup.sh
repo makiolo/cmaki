@@ -3,9 +3,9 @@ export NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 export NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
 export CC="${CC:-gcc}"
 export CXX="${CXX:-g++}"
-export MODE=${MODE:-Debug}
-export CMAKI_INSTALL=${CMAKI_INSTALL:-$CMAKI_PWD/bin}
-export CMAKI_GENERATOR=${CMAKI_GENERATOR:-"Unix Makefiles"}
+export MODE="${MODE:-Debug}"
+export CMAKI_INSTALL="${CMAKI_INSTALL:-$CMAKI_PWD/bin}"
+export CMAKI_GENERATOR="${CMAKI_GENERATOR:-Unix Makefiles}"
 
 echo "running in mode $MODE ... ($CC / $CXX)"
 if [ -f "CMakeCache.txt" ]; then
