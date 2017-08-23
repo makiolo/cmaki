@@ -19,6 +19,6 @@ else
 fi
 
 if [ -f "cmaki.yml" ]; then
-  # IDEA: interesting autogenerate cmaki.yml from package.json (npm info)
-  echo TODO: generate artifact and upload with cmaki_generator (npm run upload)
+  # IDEA: interesting autogenerate cmaki.yml from package.json
+  echo TODO: generate artifact and upload with cmaki_generator
 fi
