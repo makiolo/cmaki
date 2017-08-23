@@ -19,4 +19,7 @@ md %MODE%
 :: setup
 cd %MODE%
 cmake .. -DCMAKE_BUILD_TYPE=%MODE% -DFIRST_ERROR=1 -G"%GENERATOR%"
+set lasterror=%errorlevel%
 cd ..
+
+if %lasterror% neq 0 exit /b %lasterror%
