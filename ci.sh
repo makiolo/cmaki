@@ -5,21 +5,15 @@ echo [0/3] preinstall
 export CMAKI_PWD=$(pwd)
 env | sort
 
-if [ "$EUID" -e 0 ]; then
-  pip install --user pyyaml
-  pip install --user poster
-  pip install --user codecov
-fi
+pip install --user pyyaml
+pip install --user poster
+pip install --user codecov
 
 if [ -f "package.json" ]; then
 
   echo [1/3] prepare
-  if [ "$EUID" -e 0 ]; then
-	npm install -g npm-check-updates
-	ncu -u
-  else
-	echo skipping execute "ncu" because not is root
-  fi
+  npm install -g npm-check-updates
+  ncu -u
 
   echo [2/3] compile
   npm install
@@ -47,3 +41,4 @@ if [ -d "node_modules/.bin" ]; then
   echo list npm bin
   ls -ltr node_modules/.bin
 fi
+
