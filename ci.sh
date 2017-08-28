@@ -36,9 +36,3 @@ if [ -f "cmaki.yml" ]; then
   # IDEA: interesting autogenerate cmaki.yml from package.json
   echo TODO: generate artifact and upload with cmaki_generator
 fi
-
-if [ -d "node_modules/.bin" ]; then
-  echo list npm bin
-  ls -ltr node_modules/.bin
-fi
-
