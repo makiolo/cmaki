@@ -9,7 +9,7 @@ macro(cmaki_setup)
 	enable_modern_cpp()
 	enable_testing()
 	SET(CMAKE_BUILD_TYPE_INIT Release)
-	include_directories(.)
+	include_directories(../../node_modules)
 	include_directories(node_modules)
 endmacro()
 
