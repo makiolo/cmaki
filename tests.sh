@@ -30,6 +30,7 @@ if [ "$COVERAGE" == "TRUE" ]; then
 			lcov -r coverage.info 'tests/*' -o coverage.info
 			lcov -r coverage.info 'gtest/*' -o coverage.info
 			lcov -r coverage.info 'gmock/*' -o coverage.info
+			lcov -r coverage.info 'node_modules/*' -o coverage.info
 			# lcov -l coverage.info
 			genhtml --no-branch-coverage -o ../../coverage/ coverage.info
 			if [ "$NOCODECOV" == "FALSE" ]; then
@@ -43,7 +44,7 @@ fi
 if [ "$CPPCHECK" == "TRUE" ]; then
 	if [[ "$CC" == "gcc" ]]; then
 		if [[ "$MODE" == "Debug" ]]; then
-			cppcheck -i node_modules -i $CC --inconclusive --check-config --max-configs=10 --enable=all -UDEBUG --inline-suppr .
+			cppcheck -i ../../node_modules -i ../../$CC --inconclusive --check-config --max-configs=10 --enable=all -UDEBUG --inline-suppr ../..
 		fi
 	fi
 fi
