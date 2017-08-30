@@ -41,9 +41,9 @@ if [ "$COVERAGE" == "TRUE" ]; then
 fi
 
 if [ "$CPPCHECK" == "TRUE" ]; then
-	if [[ "$CC" == "clang" ]]; then
+	if [[ "$CC" == "gcc" ]]; then
 		if [[ "$MODE" == "Debug" ]]; then
-			cppcheck -i node_modules -i gcc -i clang --inconclusive --check-config --max-configs=10 --enable=all -UDEBUG --inline-suppr .
+			cppcheck -i node_modules -i $CC --inconclusive --check-config --max-configs=10 --enable=all -UDEBUG --inline-suppr .
 		fi
 	fi
 fi
