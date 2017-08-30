@@ -17,6 +17,9 @@
 	"tests.sh": "./tests.sh",
 	"upload.sh": "./upload.sh"
   },
+  "scripts": {
+    "install": "cd node_modules/cmaki_identifier && npm install"
+  },
   "keywords": [
     "cmake",
     "c++",
@@ -28,6 +31,9 @@
     "url": "https://github.com/makiolo/cmaki/issues"
   },
   "homepage": "https://github.com/makiolo/cmaki#readme",
+  "devDependencies": {
+    "cmaki_identifier": "makiolo/cmaki_identifier"
+  }
   "dependencies": {
     "shelljs": "^0.7.8"
   }
