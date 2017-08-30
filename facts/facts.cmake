@@ -515,37 +515,36 @@ function(cmaki2_test)
 		INSTALL(  	TARGETS ${_TEST_NAME}_exe
 				DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 				CONFIGURATIONS ${BUILD_TYPE})
-		#  --gtest_repeat=1 --gtest_break_on_failure --gtest_shuffle --gmock_verbose=info
-		if (DEFINED VALGRIND_BUILD AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+		if (DEFINED TESTS_VALGRIND AND (TESTS_VALGRIND STREQUAL "TRUE") AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 			find_program(VALGRIND "valgrind")
 			if(VALGRIND)
 				add_test(
 					NAME ${_TEST_NAME}_memcheck
-					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_cachegrind
-					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_helgrind
-					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_callgrind
-					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_drd
-					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=info
+					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
