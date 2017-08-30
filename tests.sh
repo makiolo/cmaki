@@ -3,6 +3,7 @@ export NOCACHE_REMOTE="${NOCACHE_REMOTE:-FALSE}"
 export NOCACHE_LOCAL="${NOCACHE_LOCAL:-FALSE}"
 export NOCODECOV="${NOCODECOV:-FALSE}"
 export COVERAGE="${COVERAGE:-FALSE}"
+export CPPCHECK="${COVERAGE:-FALSE}"
 export CC="${CC:-gcc}"
 export CXX="${CXX:-g++}"
 export MODE="${MODE:-Debug}"
@@ -35,6 +36,14 @@ if [ "$COVERAGE" == "TRUE" ]; then
 				bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 			fi
 			rm -f coverage.base coverage.run coverage.info
+		fi
+	fi
+fi
+
+if [ "$CPPCHECK" == "TRUE" ]; then
+	if [[ "$CC" == "clang" ]]; then
+		if [[ "$MODE" == "Debug" ]]; then
+			cppcheck -i node_modules -i gcc -i clang --inconclusive --check-config --max-configs=10 --enable=all -UDEBUG --inline-suppr .
 		fi
 	fi
 fi
