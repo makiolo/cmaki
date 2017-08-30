@@ -233,7 +233,7 @@ function(cmaki_test)
 				)
 		else()
 
-			if (DEFINED VALGRIND_BUILD AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+			if (DEFINED TESTS_VALGRIND AND (TESTS_VALGRIND STREQUAL "TRUE") AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 				find_program(VALGRIND "valgrind")
 				if(VALGRIND)
 					add_test(
