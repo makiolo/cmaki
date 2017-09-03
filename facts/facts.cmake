@@ -247,6 +247,15 @@ function(cmaki_find_package PACKAGE)
 		find_package(${PACKAGE} ${VERSION} REQUIRED)
 	endif()
 
+	# generate json
+	execute_process(
+		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${DEPENDS_PATHFILE} --version=${VERSION}
+		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+	if(RESULT_VERSION)
+		message("error saving ${PACKAGE}:${VERSION} in ${DEPENDS_PATH}")
+	endif()
+
 	# 13 add includes
 	string(TOUPPER "${PACKAGE}" PACKAGE_UPPER)
 	foreach(INCLUDE_DIR ${${PACKAGE_UPPER}_INCLUDE_DIRS})
