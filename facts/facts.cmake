@@ -249,7 +249,7 @@ function(cmaki_find_package PACKAGE)
 
 	# generate json
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${DEPENDS_PATHFILE} --version=${VERSION}
+		COMMAND python ${ARTIFACTS_PATH}/save_package.py --name=${PACKAGE} --depends=${DEPENDS_PATHFILE} --version=${VERSION}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(RESULT_VERSION)
