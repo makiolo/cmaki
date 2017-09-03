@@ -434,7 +434,8 @@ macro(enable_modern_cpp)
 		add_definitions(${EXTRA_DEF})
 	endif()
 
-	if ((DEFINED COVERAGE) AND (COVERAGE STREQUAL "TRUE"))
+	# TODO: need different combinations of artifacts (coverage=off / coverage=on, etc ...)
+	# if ((DEFINED COVERAGE) AND (COVERAGE STREQUAL "TRUE"))
 		# https://github.com/google/sanitizers/wiki/AddressSanitizerAsDso
 		# flags
 		if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
@@ -447,7 +448,7 @@ macro(enable_modern_cpp)
 		if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 			SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 		endif()
-	endif()
+	# endif()
 
 endmacro()
 
