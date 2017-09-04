@@ -35,6 +35,11 @@ fi
 
 if [ -f "cmaki.yml" ]; then
   echo [4/3] upload artifact
-  # IDEA: interesting autogenerate cmaki.yml from package.json
-  echo TODO: generate artifact and upload with cmaki_generator
+  if [ -f "package.json" ]; then
+    # IDEA: interesting autogenerate cmaki.yml from package.json
+    # echo TODO: generate artifact and upload with cmaki_generator
+    npm run upload
+  else
+    ./node_modules/cmaki/upload.sh
+  fi
 fi
