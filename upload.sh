@@ -4,8 +4,6 @@ export PACKAGE=$(basename $CMAKI_PWD)
 export YMLFILE=$CMAKI_PWD/cmaki.yml
 export CMAKI_IDENTIFIER_FOLDER=cmaki_identifier
 
-mkdir -p node_modules/cmaki
-
 cd $(pwd)/node_modules/cmaki_generator
 
 echo ---------- identify platform (in upload) ----------
