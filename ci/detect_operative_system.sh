@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export MODE="${MODE:-Debug}"
-$DIR_SCRIPT/$MODE/predef
+export CMAKI_INSTALL="${CMAKI_INSTALL:-$CMAKI_PWD/bin}"
+$CMAKI_INSTALL/cmaki_identifier
 
