@@ -11,10 +11,12 @@ $CMAKI_PWD/node_modules/cmaki/clean.sh
 
 # identify
 echo ---------- identify platform ----------
-git clone https://github.com/makiolo/cmaki_identifier.git $CMAKI_IDENTIFIER_FOLDER
-cd $CMAKI_IDENTIFIER_FOLDER
-CMAKI_INSTALL=$CMAKI_PWD/node_modules/cmaki/ci npm install
-cd -
+if [ ! -d "$CMAKI_IDENTIFIER_FOLDER" ]; then
+  git clone https://github.com/makiolo/cmaki_identifier.git $CMAKI_IDENTIFIER_FOLDER
+  cd $CMAKI_IDENTIFIER_FOLDER
+  CMAKI_INSTALL=$CMAKI_PWD/node_modules/cmaki/ci npm install
+  cd -
+fi
 $CMAKI_PWD/node_modules/cmaki/ci/$MODE/predef
 echo ---------------------------------------
 
