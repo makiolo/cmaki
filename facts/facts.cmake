@@ -69,7 +69,7 @@ IF(WIN32)
 	endif(CMAKE_CL_64)
 ELSE()
 	execute_process(
-		COMMAND sh detect_operative_system.sh
+		COMMAND bash detect_operative_system.sh
 		WORKING_DIRECTORY "${CMAKI_PATH}/ci"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
