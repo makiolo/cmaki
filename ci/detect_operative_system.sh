@@ -1,8 +1,9 @@
 #!/bin/bash
 
-DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export USE_CMAKI_IDENTIFIER="${USE_CMAKI_IDENTIFIER:-FALSE}"
+export DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ -f "$DIR_SCRIPT/predef" ]; then
+if [ "$USE_CMAKI_IDENTIFIER" == "TRUE" ]; then
 	OSSTR=$($DIR_SCRIPT/predef)
 	echo "${OSSTR}"
 else
