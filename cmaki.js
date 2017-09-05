@@ -19,7 +19,6 @@ if (is_win)
 	exists = fs.existsSync(script_execute)
 	caller_execute = "cmd /c "
 	script_execute = script_execute.replace(/\//g, "\\");
-	// console.log("detect: windows - " + os.platform());
 }
 else
 {
@@ -27,11 +26,7 @@ else
 	exists = fs.existsSync(script_execute)
 	caller_execute = "bash "
 	script_execute = script_execute.replace(/\\/g, "/");
-	// console.log("detect: linux");
 }
-
-// console.log("caller: " + caller_execute);
-// console.log("script: " + script_execute);
 
 if(exists)
 {
@@ -49,4 +44,3 @@ else
 {
 	console.log("[error] dont exits: " + script_execute);
 }
-
