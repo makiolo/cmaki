@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export USE_CMAKI_IDENTIFIER="${USE_CMAKI_IDENTIFIER:-FALSE}"
+export USE_CMAKI_IDENTIFIER="${USE_CMAKI_IDENTIFIER:-TRUE}"
 export DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export MODE="${MODE:-Debug}"
 
