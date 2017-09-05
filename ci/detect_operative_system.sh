@@ -2,15 +2,14 @@
 
 export USE_CMAKI_IDENTIFIER="${USE_CMAKI_IDENTIFIER:-FALSE}"
 export DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export MODE="${MODE:-Debug}"
 
 if [ "$USE_CMAKI_IDENTIFIER" == "TRUE" ]; then
-	OSSTR=$($DIR_SCRIPT/predef)
-	echo "${OSSTR}"
+	$DIR_SCRIPT/$MODE/predef
 else
 	OS=`uname -s`
 	REV=`uname -r`
 	MACH=`uname -m`
-	MODE="${MODE:-Debug}"
 	CC="${CC:-gcc}"
 	CC=$(basename $CC)
 	OSSTR=$(uname | tr "[:upper:]" "[:lower:]")
