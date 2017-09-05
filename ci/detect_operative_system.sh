@@ -1,9 +1,10 @@
 #!/bin/bash
-# Detects which OS and if it is Linux then it will detect which Linux
-# Distribution.
 
-if [ -f "predef" ]; then
-	./predef
+DIR_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ -f "$DIR_SCRIPT/predef" ]; then
+	OSSTR=$($DIR_SCRIPT/predef)
+	echo "${OSSTR}"
 else
 	OS=`uname -s`
 	REV=`uname -r`
