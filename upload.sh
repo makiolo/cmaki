@@ -6,7 +6,7 @@ export CMAKI_IDENTIFIER_FOLDER=cmaki_identifier
 
 cd $(pwd)/node_modules/cmaki_generator
 
-echo ---------- identify platform (in upload) ----------
+echo ---------- identify platform - in upload ----------
 if [ ! -d "$CMAKI_IDENTIFIER_FOLDER" ]; then
   git clone https://github.com/makiolo/cmaki_identifier.git $CMAKI_IDENTIFIER_FOLDER
   cd $CMAKI_IDENTIFIER_FOLDER # enter $(pwd)/node_modules/cmaki_generator/cmaki_identifier
