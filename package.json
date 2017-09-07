@@ -29,8 +29,5 @@
   "homepage": "https://github.com/makiolo/cmaki#readme",
   "devDependencies": {
     "cmaki_identifier": "makiolo/cmaki_identifier"
-  },
-  "dependencies": {
-    "shelljs": "^0.7.8"
   }
 }
