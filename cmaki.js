@@ -2,7 +2,13 @@
 var os = require('os')
 var fs = require('fs');
 var path = require('path')
-var exec = require('shelljs').exec;
+var shelljs = require('shelljs').exec;
+var exec = shelljs.exec;
+
+// set working directory
+// __dirname is script directory
+shelljs.env['CMAKI_PWD'] = process.cwd();
+process.env['CMAKI_PWD'] = process.cwd();
 
 function trim(s)
 {
