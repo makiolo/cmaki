@@ -494,3 +494,7 @@ macro(generate_clang)
 	STRING(REGEX REPLACE ";" "\n" extra_parameters "${extra_parameters}")
 	FILE(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/.clang_complete" "${extra_parameters}\n")
 endmacro()
+
+# setup initial
+cmaki_setup()
+
