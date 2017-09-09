@@ -74,7 +74,7 @@ ELSE()
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	set(CMAKI_PLATFORM "${RESULT_VERSION}")
 ENDIF()
-message("---- detecting platform: ${CMAKI_PLATFORM}")
+# message("---- detecting platform: ${CMAKI_PLATFORM}")
 
 function(cmaki_find_package PACKAGE)
 
