@@ -79,7 +79,8 @@ ENDIF()
 function(cmaki_find_package PACKAGE)
 
 	IF(NOT DEFINED CMAKI_REPOSITORY)
-		MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
+		# MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
+		set(CMAKI_REPOSITORY "http://artifacts.myftp.biz:8080")
 	ENDIF()
 
 	# 1. obtener la version actual (o ninguno en caso de no tener el artefacto)
@@ -160,7 +161,7 @@ function(cmaki_find_package PACKAGE)
 			# no queremos usar "-o", queremos que trate de compilar las dependencias (sin -o)
 			# pero queremos que evite compilar cosas que estan en cache remota
 			#
-			message("command: python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}")
+			# message("command: python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
