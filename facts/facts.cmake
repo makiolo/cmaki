@@ -143,6 +143,7 @@ function(cmaki_find_package PACKAGE)
 		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
 		set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz")
 		set(http_package_cmake_filename "${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename}")
+		message("download from ${http_package_cmake_filename}")
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
 		if(NOT "${NO_USE_CACHE_REMOTE}")
 			cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
