@@ -1,5 +1,3 @@
 FROM ubuntu:latest
-RUN apt-get install gcc
-RUN apt-get install clang
-# WORKDIR /app
-# COPY Rakefile /app/
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get -y install gcc && rm -rf /var/lib/apt/lists/*
