@@ -1,0 +1,6 @@
+db:
+  image: postgres
+lol:
+  build: .
+  links:
+    - db
