@@ -5,10 +5,14 @@ services:
   - docker
 
 before_install:
+  - git clone https://github.com/dockcross/dockcross.git
   - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - docker-compose build
 
 script:
-  - docker-compose run lol npm install
+  # - docker-compose run lol npm install
+  - docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
+  - chmod +x ./dockcross-linux-armv7
+  - ./dockcross-linux-armv7 bash -c 'npm install'
