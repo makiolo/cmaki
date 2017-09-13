@@ -12,4 +12,5 @@ before_install:
 
 script:
   - # sudo docker-compose run npm install
-  - npm install
+  - docker run -v "$PWD":/usr/src/app -w /usr/src/app node:4 npm install
+  - # npm install
