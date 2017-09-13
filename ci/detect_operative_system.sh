@@ -4,7 +4,7 @@ export PATH=$CMAKI_INSTALL:$PATH
 export COMPILER_BASENAME=$(basename ${CC})
 
 cmaki_identifier > /dev/null 2>&1
-if [ $? != 0 ]; then
+if [ "$?"-ne 0]; then
   echo $COMPILER_BASENAME
 else
   cmaki_identifier
