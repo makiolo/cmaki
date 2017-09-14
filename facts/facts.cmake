@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0011 NEW)
 cmake_policy(SET CMP0045 OLD)
 
-IF(NOT DEFINED CMAKI_PATH)
-	set(CMAKI_PATH ${CMAKE_MODULE_PATH})
-ENDIF()
-
 IF(NOT DEFINED DEPENDS_PATH)
 	set(DEPENDS_PATH ${CMAKI_PATH}/../../artifacts)
 ENDIF()

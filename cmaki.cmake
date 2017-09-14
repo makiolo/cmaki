@@ -1,6 +1,12 @@
 if(NOT DEFINED CMAKE_MODULE_PATH)
 	set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 endif()
+
+IF(NOT DEFINED CMAKI_PATH)
+	# set(CMAKI_PATH ${CMAKE_MODULE_PATH})
+	set(CMAKI_PATH ${CMAKE_CURRENT_LIST_DIR})
+ENDIF()
+
 include("${CMAKE_CURRENT_LIST_DIR}/facts/facts.cmake")
 
 option(FIRST_ERROR "stop on first compilation error" FALSE)
