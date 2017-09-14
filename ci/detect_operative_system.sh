@@ -5,7 +5,7 @@ export CXX="${CXX:-g++}"
 export MODE="${MODE:-Debug}"
 export CMAKI_INSTALL="${CMAKI_INSTALL:-$CMAKI_PWD/bin}"
 export CMAKI_EMULATOR="${CMAKI_EMULATOR:-}"
+# export PATH=$CMAKI_INSTALL:$PATH
 
-export PATH=$CMAKI_INSTALL:$PATH
-$CMAKI_EMULATOR cmaki_identifier
+$CMAKI_EMULATOR $CMAKI_INSTALL/cmaki_identifier.exe
 
