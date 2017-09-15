@@ -57,20 +57,12 @@ ELSE()
 	SET(CMAKI_COMPILER "${compiler}")
 ENDIF()
 
-IF(WIN32)
-	if(CMAKE_CL_64)
-		set(CMAKI_PLATFORM "win64")
-	else(CMAKE_CL_64)
-		set(CMAKI_PLATFORM "win32")
-	endif(CMAKE_CL_64)
-ELSE()
-	execute_process(
-		COMMAND bash detect_operative_system.sh
-		WORKING_DIRECTORY "${CMAKI_PATH}/ci"
-		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-	set(CMAKI_PLATFORM "${RESULT_VERSION}")
-ENDIF()
-# message("---- detecting platform: ${CMAKI_PLATFORM}")
+execute_process(
+	COMMAND cmake -P cmaki_identifier.cmake
+	WORKING_DIRECTORY "$ENV{CMAKI_INSTALL}"
+	OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(CMAKI_PLATFORM "${RESULT_VERSION}")
+message("---- detecting platform: ${CMAKI_PLATFORM}")
 
 function(cmaki_find_package PACKAGE)
 
