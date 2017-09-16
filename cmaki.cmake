@@ -345,6 +345,10 @@ macro(common_flags)
 		add_definitions(-Zm200)
 	endif()
 
+	if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+		set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
+	endif()
+
 endmacro()
 
 macro(enable_modern_cpp)
