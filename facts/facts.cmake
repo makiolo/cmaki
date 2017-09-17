@@ -45,6 +45,8 @@ execute_process(
 	OUTPUT_VARIABLE RESULT_VERSION
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(CMAKI_IDENTIFIER "${RESULT_VERSION}")
+# TODO: for support old code
+set(CMAKI_PLATFORM "${RESULT_VERSION}")
 
 function(cmaki_find_package PACKAGE)
 
