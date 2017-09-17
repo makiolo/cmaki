@@ -30,13 +30,13 @@ if(DEFINED CMAKI_DEBUG)
 	MESSAGE("DEPENDS_PATHFILE = ${DEPENDS_PATHFILE}")
 endif()
 
-set(ENV{CMAKI_INFO} COMPILER)
-execute_process(
-	COMMAND bash cmaki_identifier.sh
-	WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
-	OUTPUT_VARIABLE RESULT_VERSION
-	OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(CMAKI_COMPILER "${RESULT_VERSION}")
+# set(ENV{CMAKI_INFO} COMPILER)
+# execute_process(
+# 	COMMAND bash cmaki_identifier.sh
+# 	WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
+# 	OUTPUT_VARIABLE RESULT_VERSION
+# 	OUTPUT_STRIP_TRAILING_WHITESPACE)
+# set(CMAKI_COMPILER "${RESULT_VERSION}")
 
 set(ENV{CMAKI_INFO} ALL)
 execute_process(
@@ -44,8 +44,7 @@ execute_process(
 	WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
 	OUTPUT_VARIABLE RESULT_VERSION
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
-set(CMAKI_PLATFORM "${RESULT_VERSION}")
-message("---- detecting platform: ${CMAKI_PLATFORM}")
+set(CMAKI_IDENTIFIER "${RESULT_VERSION}")
 
 function(cmaki_find_package PACKAGE)
 
@@ -82,7 +81,7 @@ function(cmaki_find_package PACKAGE)
 	#######################################################
 	# 2. obtener la mejor version buscando en la cache local y remota
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION}
+		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(RESULT_VERSION)
@@ -102,7 +101,7 @@ function(cmaki_find_package PACKAGE)
 	set(depends_dir "${DEPENDS_PATH}")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
-	set(package_marker "${depends_bin_package}/${CMAKI_PLATFORM}.cache")
+	set(package_marker "${depends_bin_package}/${CMAKI_IDENTIFIER}.cache")
 	if(NOT EXISTS "${package_marker}" OR "${NO_USE_CACHE_LOCAL}")
 		# pido un paquete, en funcion de:
 		#		- paquete
@@ -112,9 +111,9 @@ function(cmaki_find_package PACKAGE)
 		# Recibo el que mejor se adapta a mis especificaciones
 		# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
 		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
-		set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz")
+		set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz")
 		set(http_package_cmake_filename "${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename}")
-		message("download from ${http_package_cmake_filename}")
+		# message("download from ${http_package_cmake_filename}")
 		# 4. descargo el fichero que se supone tienes los ficheros cmake
 		if(NOT "${NO_USE_CACHE_REMOTE}")
 			cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
@@ -133,7 +132,6 @@ function(cmaki_find_package PACKAGE)
 			# no queremos usar "-o", queremos que trate de compilar las dependencias (sin -o)
 			# pero queremos que evite compilar cosas que estan en cache remota
 			#
-			# message("command: python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}")
 			execute_process(
 				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${CMAKE_PREFIX_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY} -d
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
@@ -149,7 +147,7 @@ function(cmaki_find_package PACKAGE)
 			#######################################################
 			# 6: obtengo la version del paquete creado
 			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE} ${EXTRA_VERSION}
+				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}
 				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 			if(RESULT_VERSION)
@@ -161,8 +159,8 @@ function(cmaki_find_package PACKAGE)
 			endif()
 			#######################################################
 
-			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}.tar.gz)
-			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_PLATFORM}-cmake.tar.gz)
+			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz)
+			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz)
 			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
 			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
 
@@ -256,7 +254,7 @@ macro(cmaki_package_version_check)
 	# llamar a check_remote_version
 	# dando el nombre recibo la version
 	execute_process(
-		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_PLATFORM} --name=${PACKAGE_FIND_NAME} --version=${PACKAGE_FIND_VERSION}
+		COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE_FIND_NAME} --version=${PACKAGE_FIND_VERSION}
 		WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 		OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 	list(GET RESULT_VERSION 0 RESULT)
@@ -310,37 +308,29 @@ function(cmaki_download_file THE_URL INTO_FILE)
 endfunction()
 
 macro(cmaki_download_package)
-	# Base URL for packages.
 	if(NOT DEFINED CMAKI_REPOSITORY)
-		# MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
 		set(CMAKI_REPOSITORY "http://artifacts.myftp.biz:8080")
 	endif()
 	get_filename_component(package_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
-	# ${package_name} en realidad es paquete + version (asyncply-0.0.0.0)
-	get_filename_component(package_name "${package_dir}" NAME)
-	set(package_filename ${package_name}-${CMAKI_PLATFORM}.tar.gz)
+	get_filename_component(package_name_version "${package_dir}" NAME)
+	set(package_filename ${package_name_version}-${CMAKI_IDENTIFIER}.tar.gz)
 	set(http_package_filename ${CMAKI_REPOSITORY}/download.php?file=${package_filename})
-
-	# URL implicita
-	# strip implicito
-
 	set(depends_dir "${DEPENDS_PATH}")
 	get_filename_component(depends_dir "${depends_dir}" ABSOLUTE)
-	set(package_compessed "${depends_dir}/${package_name}.tar.gz")
-	set(package_uncompressed_dir "${depends_dir}/${package_name}.tmp")
-	set(package_marker "${depends_dir}/${package_name}/${CMAKI_PLATFORM}.cache")
-	set(package_compressed_md5 "${package_dir}/${package_name}-${CMAKI_PLATFORM}.md5")
-	set(strip_compressed "${package_name}")
+	set(package_compessed "${depends_dir}/${package_name_version}.tar.gz")
+	set(package_uncompressed_dir "${depends_dir}/${package_name_version}.tmp")
+	set(package_marker "${depends_dir}/${package_name_version}/${CMAKI_IDENTIFIER}.cache")
+	set(package_compressed_md5 "${package_dir}/${package_name_version}-${CMAKI_IDENTIFIER}.md5")
+	set(strip_compressed "${package_name_version}")
 	set(_MY_DIR "${package_dir}")
 	set(_DIR "${depends_dir}/${strip_compressed}")
 
 	if(NOT EXISTS "${package_marker}")
-		# TODO: avoid doble download
 		file(REMOVE "${package_compessed}")
 		if(EXISTS "${package_compressed_md5}")
 			file(READ "${package_compressed_md5}" md5sum )
 			string(REGEX MATCH "[0-9a-fA-F]*" md5sum "${md5sum}")
-			# TODO: use md5sum
+			# TODO: use md5sum (use python for download)
 			# cmaki_download_file("${http_package_filename}" "${package_compessed}" "${md5sum}" )
 			message("downloading ${http_package_filename}")
 			cmaki_download_file("${http_package_filename}" "${package_compessed}")
@@ -349,7 +339,7 @@ macro(cmaki_download_package)
 				message(FATAL_ERROR "Error downloading ${http_package_filename}")
 			endif()
 		else()
-			MESSAGE("Checksum for ${package_name}-${CMAKI_PLATFORM}.tar.gz not found. Rejecting to download an untrustworthy file.")
+			MESSAGE("Checksum for ${package_name_version}-${CMAKI_IDENTIFIER}.tar.gz not found. Rejecting to download an untrustworthy file.")
 			file(REMOVE_RECURSE "${package_dir}")
 			file(REMOVE_RECURSE "${_DIR}")
 		endif()
@@ -397,7 +387,6 @@ function(cmaki2_executable)
 		ADD_EXECUTABLE(${_EXECUTABLE_NAME} ${_SOURCES})
 	endif()
 	target_link_libraries(${_EXECUTABLE_NAME} ${_DEPENDS})
-	# echo_targets(${_EXECUTABLE_NAME})
 	foreach(LIB_DIR ${CMAKI_LIBRARIES})
 		target_link_libraries(${_EXECUTABLE_NAME} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
@@ -438,7 +427,6 @@ function(cmaki2_library)
 	endif()
 	add_library(${_LIBRARY_NAME} SHARED ${_SOURCES})
 	target_link_libraries(${_LIBRARY_NAME} ${_DEPENDS})
-	# echo_targets(${_LIBRARY_NAME})
 	foreach(LIB_DIR ${CMAKI_LIBRARIES})
 		target_link_libraries(${_LIBRARY_NAME} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
@@ -455,7 +443,6 @@ function(cmaki2_library)
 					DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 					CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
-
 endfunction()
 
 function(cmaki2_static_library)
@@ -479,7 +466,6 @@ function(cmaki2_static_library)
 	endif()
 	add_library(${_LIBRARY_NAME} STATIC ${_SOURCES})
 	target_link_libraries(${_LIBRARY_NAME} ${_DEPENDS})
-	# echo_targets(${_LIBRARY_NAME})
 	foreach(LIB_DIR ${CMAKI_LIBRARIES})
 		target_link_libraries(${_LIBRARY_NAME} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
@@ -501,8 +487,9 @@ endfunction()
 function(cmaki2_test)
 	cmaki_parse_parameters(${ARGV})
 	set(_TEST_NAME ${_MAIN_NAME})
+	set(_TEST_SUFFIX "_unittest")
 	common_flags()
-	common_linking(${_TEST_NAME}_exe)
+	common_linking(${_TEST_NAME}${_TEST_SUFFIX})
 	include_directories(node_modules)
 	foreach(INCLUDE_DIR ${CMAKI_INCLUDE_DIRS})
 		include_directories(${INCLUDE_DIR})
@@ -514,53 +501,53 @@ function(cmaki2_test)
 			add_compile_options(-pthread)
 		endif()
 	endif()
-	add_executable(${_TEST_NAME}_exe ${_SOURCES})
-	target_link_libraries(${_TEST_NAME}_exe ${_DEPENDS})
+	add_executable(${_TEST_NAME}${_TEST_SUFFIX} ${_SOURCES})
+	target_link_libraries(${_TEST_NAME}${_TEST_SUFFIX} ${_DEPENDS})
 	foreach(LIB_DIR ${CMAKI_LIBRARIES})
-		target_link_libraries(${_TEST_NAME}_exe ${LIB_DIR})
+		target_link_libraries(${_TEST_NAME}${_TEST_SUFFIX} ${LIB_DIR})
 		cmaki_install_3rdparty(${LIB_DIR})
 	endforeach()
 	if(HAVE_PTHREADS)
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
 			message("-- android no need extra linkage for pthreads")
 		else()
-			target_link_libraries(${_TEST_NAME}_exe -lpthread)
+			target_link_libraries(${_TEST_NAME}${_TEST_SUFFIX} -lpthread)
 		endif()
 	endif()
 	foreach(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-		INSTALL(  	TARGETS ${_TEST_NAME}_exe
+		INSTALL(  	TARGETS ${_TEST_NAME}${_TEST_SUFFIX}
 				DESTINATION ${BUILD_TYPE}/${_SUFFIX_DESTINATION}
 				CONFIGURATIONS ${BUILD_TYPE})
 		if (DEFINED TESTS_VALGRIND AND (TESTS_VALGRIND STREQUAL "TRUE") AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
 			find_program(VALGRIND "valgrind")
 			if(VALGRIND)
 				add_test(
-					NAME ${_TEST_NAME}_memcheck
+					NAME ${_TEST_NAME}_valgrind_memcheck
 					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_cachegrind
-					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+					COMMAND "${VALGRIND}" --tool=cachegrind $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_helgrind
-					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+					COMMAND "${VALGRIND}" --tool=helgrind $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
 					NAME ${_TEST_NAME}_callgrind
-					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+					COMMAND "${VALGRIND}" --tool=callgrind $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
 				add_test(
-					NAME ${_TEST_NAME}_drd
-					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+					NAME ${_TEST_NAME}_valgrind_drd
+					COMMAND "${VALGRIND}" --tool=drd --read-var-info=yes $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
@@ -570,14 +557,14 @@ function(cmaki2_test)
 		endif()
 		if(DEFINED ENV{CMAKI_EMULATOR})
 			add_test(
-				NAME ${_TEST_NAME}_test
-				COMMAND "$ENV{CMAKI_EMULATOR}" $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+				NAME ${_TEST_NAME}_emulated_test
+				COMMAND "$ENV{CMAKI_EMULATOR}" $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 				CONFIGURATIONS ${BUILD_TYPE})
 		else()
 			add_test(
-				NAME ${_TEST_NAME}_test
-				COMMAND $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+				NAME ${_TEST_NAME}_normal_test
+				COMMAND $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 				WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 				CONFIGURATIONS ${BUILD_TYPE})
 		endif()
@@ -628,3 +615,4 @@ macro(cmaki_python_install)
 	get_filename_component(PYTHON3_PARENT_DIR ${PYTHON3_DIR} DIRECTORY)
 	cmaki_install_inside_dir(${PYTHON3_PARENT_DIR})
 endmacro()
+
