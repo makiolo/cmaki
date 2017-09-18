@@ -1,18 +1,8 @@
-language: node_js
-node_js: "7"
-sudo: required
-services:
-  - docker
-
-before_install:
-  - git clone https://github.com/dockcross/dockcross.git
-  # - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose
-  # - chmod +x docker-compose
-  # - sudo mv docker-compose /usr/local/bin
-  # - docker-compose build
-
+language: c
+services: docker
+os: linux
+env:
+  # funciona
+  - IMAGE=linux-x64
 script:
-  # - docker-compose run lol npm install
-  - docker run --rm dockcross/linux-armv7 > ./dockcross-linux-armv7
-  - chmod +x ./dockcross-linux-armv7
-  - ./dockcross-linux-armv7 bash -c 'npm install'
+  - bash <(curl -s https://raw.githubusercontent.com/makiolo/cmaki_scripts/master/docker.sh)
