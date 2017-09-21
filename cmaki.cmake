@@ -296,22 +296,10 @@ function(cmaki_simple_test)
 					message(FATAL_ERROR "no valgrind detected")
 				endif()
 			else()
-				if(DEFINED ENV{CMAKI_EMULATOR})
-					add_test(
-						NAME "$ENV{CMAKI_EMULATOR}" ${_TEST_NAME}_test
-						COMMAND ${_TEST_NAME}
-						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
-						CONFIGURATIONS ${BUILD_TYPE}
-						)
-				else()
-					add_test(
-						NAME ${_TEST_NAME}_test
-						COMMAND ${_TEST_NAME}
-						WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
-						CONFIGURATIONS ${BUILD_TYPE}
-						)
-				endif()
-
+				NAME ${_TEST_NAME}_test						
+				COMMAND bash cmaki_emulator.sh $<TARGET_FILE:${_TEST_NAME}>
+				WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
+				CONFIGURATIONS ${BUILD_TYPE})
 			endif()
 		endif()
 	endforeach()
