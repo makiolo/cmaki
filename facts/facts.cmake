@@ -525,7 +525,7 @@ function(cmaki_test)
 			if(VALGRIND)
 				add_test(
 					NAME ${_TEST_NAME}_valgrind_memcheck
-					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}_exe> --gmock_verbose=error
+					COMMAND "${VALGRIND}" --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 					WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${BUILD_TYPE}
 					CONFIGURATIONS ${BUILD_TYPE}
 					)
@@ -558,8 +558,8 @@ function(cmaki_test)
 			endif()
 		endif()
 		add_test(
-			NAME ${_TEST_NAME}_unittest						
-			COMMAND bash cmaki_emulator.sh $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=error
+			NAME ${_TEST_NAME}${_TEST_SUFFIX}
+			COMMAND bash cmaki_emulator.sh $<TARGET_FILE:${_TEST_NAME}${_TEST_SUFFIX}> --gmock_verbose=error
 			WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
 			CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
