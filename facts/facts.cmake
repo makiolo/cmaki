@@ -557,10 +557,11 @@ function(cmaki_test)
 				message(FATAL_ERROR "no valgrind detected")
 			endif()
 		endif()
-		NAME ${_TEST_NAME}_unittest						
-		COMMAND bash cmaki_emulator.sh $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=error
-		WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
-		CONFIGURATIONS ${BUILD_TYPE})
+		add_test(
+			NAME ${_TEST_NAME}_unittest						
+			COMMAND bash cmaki_emulator.sh $<TARGET_FILE:${_TEST_NAME}> --gmock_verbose=error
+			WORKING_DIRECTORY $ENV{CMAKI_INSTALL}
+			CONFIGURATIONS ${BUILD_TYPE})
 	endforeach()
 	generate_vcxproj_user(${_TEST_NAME})
 
