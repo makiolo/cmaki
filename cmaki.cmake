@@ -350,6 +350,7 @@ macro(enable_modern_cpp)
 
 	if(WIN32 AND (NOT MINGW) AND (NOT MSYS))
 		add_definitions(/EHsc)
+		add_definitions(/D_SCL_SECURE_NO_WARNINGS)
 	else()
 		# add_definitions(-fno-rtti -fno-exceptions )
 		# activate all warnings and convert in errors
