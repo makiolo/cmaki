@@ -347,6 +347,8 @@ macro(cmaki_download_package)
 	set(_MY_DIR "${package_dir}")
 	set(_DIR "${depends_dir}/${strip_compressed}")
 
+	message("marca: ${package_marker}")
+
 	# set(SUPOSITION_ALREADY_UPLOAD TRUE)
 	if(NOT EXISTS "${package_marker}")
 		file(REMOVE "${package_compessed}")
