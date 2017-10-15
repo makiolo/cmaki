@@ -364,7 +364,9 @@ macro(cmaki_download_package)
 			message(FATAL_ERROR "Extracting ${package_compessed} failed! Error ${uncompress_result}")
 		endif()
 		file(COPY "${package_uncompressed_dir}/${strip_compressed}" DESTINATION "${depends_dir}")
-		file(REMOVE "${package_compessed}")
+		# TODO: cuando borrar los paquetes
+		# aqui podriamos estar borrando antes de subirlo
+		# file(REMOVE "${package_compessed}")
 		file(REMOVE_RECURSE "${package_uncompressed_dir}")
 		file(WRITE "${package_marker}" "")
 	endif()
