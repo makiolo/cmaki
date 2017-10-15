@@ -112,7 +112,7 @@ function(cmaki_find_package)
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
 	set(package_marker "${depends_bin_package}/${CMAKI_IDENTIFIER}.cache")
-	if(NOT EXISTS "${package_marker}" OR "${NO_USE_CACHE_LOCAL}")
+	if("${NO_USE_CACHE_LOCAL}")
 		# pido un paquete, en funcion de:
 		#		- paquete
 		#		- version
@@ -122,7 +122,7 @@ function(cmaki_find_package)
 		# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
 		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
 		set(package_binary_filename "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz")
-		IF(NOT EXISTS "${package_binary_filename}")
+		IF(NOT EXISTS "${package_marker}" OR NOT EXISTS "${package_binary_filename}")
 			set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz")
 			set(http_package_cmake_filename "${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename}")
 			# message("download from ${http_package_cmake_filename}")
