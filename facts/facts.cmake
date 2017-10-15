@@ -330,6 +330,7 @@ macro(cmaki_download_package)
 	set(_MY_DIR "${package_dir}")
 	set(_DIR "${depends_dir}/${strip_compressed}")
 
+	set(SUPOSITION_ALREADY_UPLOAD TRUE)
 	if(NOT EXISTS "${package_marker}")
 		file(REMOVE "${package_compessed}")
 		if(EXISTS "${package_compressed_md5}")
@@ -351,6 +352,7 @@ macro(cmaki_download_package)
 	elseif(EXISTS "${package_target}")
 		# si existe la marca y el fichero a descargar, hacemos este trick para evitar una descarga innecesaria
 		set(package_compessed "${package_target}")
+		set(SUPOSITION_ALREADY_UPLOAD FALSE)
 	endif()
 
 	if(EXISTS "${package_compessed}")
@@ -364,9 +366,9 @@ macro(cmaki_download_package)
 			message(FATAL_ERROR "Extracting ${package_compessed} failed! Error ${uncompress_result}")
 		endif()
 		file(COPY "${package_uncompressed_dir}/${strip_compressed}" DESTINATION "${depends_dir}")
-		# TODO: cuando borrar los paquetes
-		# aqui podriamos estar borrando antes de subirlo
-		# file(REMOVE "${package_compessed}")
+		if(SUPOSITION_ALREADY_UPLOAD)
+			file(REMOVE "${package_compessed}")
+		endif()
 		file(REMOVE_RECURSE "${package_uncompressed_dir}")
 		file(WRITE "${package_marker}" "")
 	endif()
