@@ -52,18 +52,25 @@ function(cmaki_find_package PACKAGE VERSION_REQUEST)
 		set(CMAKI_REPOSITORY "http://artifacts.myftp.biz:8080")
 	ENDIF()
 
-	# 1. obtener la version actual (o ninguno en caso de no tener el artefacto)
-	# execute_process(
-	# 	COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${DEPENDS_PATHFILE}
-	# 	WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-	# 	OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-	# if(RESULT_VERSION)
-	# 	set(VERSION_REQUEST "${RESULT_VERSION}")
-	# 	set(EXTRA_VERSION "--version=${VERSION_REQUEST}")
-	# else()
-	# 	set(VERSION_REQUEST "")
-	# 	set(EXTRA_VERSION "")
-	# endif()
+	if(${VERSION_REQUEST} STREQUAL "")
+
+		# 1. obtener la version actual (o ninguno en caso de no tener el artefacto)
+		execute_process(
+			COMMAND python ${ARTIFACTS_PATH}/get_package.py --name=${PACKAGE} --depends=${DEPENDS_PATHFILE}
+			WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+			OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+		if(RESULT_VERSION)
+			set(VERSION_REQUEST "${RESULT_VERSION}")
+			set(EXTRA_VERSION "--version=${VERSION_REQUEST}")
+		else()
+			set(VERSION_REQUEST "")
+			set(EXTRA_VERSION "")
+		endif()
+
+	else()
+		# explicit version required from parameters
+		set(EXTRA_VERSION "--version=${VERSION_REQUEST}")
+	endif()
 
 	# 2.5. define flags
 	if(NOT DEFINED NOCACHE_LOCAL)
