@@ -116,124 +116,124 @@ function(cmaki_find_package)
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
 	set(package_marker "${depends_bin_package}/${CMAKI_IDENTIFIER}.cache")
-	if(NO_USE_CACHE_LOCAL STREQUAL "FALSE")
-		# pido un paquete, en funcion de:
-		#		- paquete
-		#		- version
-		#		- plataforma
-		#		- modo (COMPATIBLE / EXACT)
-		# Recibo el que mejor se adapta a mis especificaciones
-		# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
-		set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
-		set(package_binary_filename "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz")
-		message("marca: ${package_marker}")
-		message("binario: ${package_binary_filename}")
-		IF(EXISTS "${package_marker}" AND EXISTS "${package_binary_filename}")
-			message("-- reusing file ${package_binary_filename} for avoid download")
-			# en este caso alguien ya nos ha colocado el binario (util para tests unitarios)
-			set(package_uncompressed_file "${package_binary_filename}")
-			set(COPY_SUCCESFUL TRUE PARENT_SCOPE)
-		else()
-			set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz")
-			set(http_package_cmake_filename "${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename}")
-			# message("download from ${http_package_cmake_filename}")
-			# 4. descargo el fichero que se supone tienes los ficheros cmake
-			if(NOT "${NO_USE_CACHE_REMOTE}")
-				cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
-			endif()
+	# pido un paquete, en funcion de:
+	#		- paquete
+	#		- version
+	#		- plataforma
+	#		- modo (COMPATIBLE / EXACT)
+	# Recibo el que mejor se adapta a mis especificaciones
+	# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
+	set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
+	set(package_binary_filename "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz")
+	message("marca: ${package_marker}")
+	message("binario: ${package_binary_filename}")
+	IF(EXISTS "${package_marker}" AND EXISTS "${package_binary_filename}")
+		message("-- reusing file ${package_binary_filename} for avoid download")
+		# en este caso alguien ya nos ha colocado el binario (util para tests unitarios)
+		set(package_uncompressed_file "${package_binary_filename}")
+		set(COPY_SUCCESFUL TRUE PARENT_SCOPE)
+	else()
+
+		# if(NO_USE_CACHE_LOCAL STREQUAL "FALSE")
+		set(package_cmake_filename "${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz")
+		set(http_package_cmake_filename "${CMAKI_REPOSITORY}/download.php?file=${package_cmake_filename}")
+		# message("download from ${http_package_cmake_filename}")
+		# 4. descargo el fichero que se supone tienes los ficheros cmake
+		if(NOT "${NO_USE_CACHE_REMOTE}")
+			cmaki_download_file("${http_package_cmake_filename}" "${package_uncompressed_file}")
 		endif()
+	endif()
 
-		# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
-		if(NOT "${COPY_SUCCESFUL}" OR "${NO_USE_CACHE_REMOTE}")
+	# Si no puede descargar el artefacto ya hecho (es que necesito compilarlo y subirlo)
+	if(NOT "${COPY_SUCCESFUL}" OR NO_USE_CACHE_REMOTE STREQUAL "TRUE")
 
+		file(REMOVE_RECURSE "${depends_bin_package}")
+		file(REMOVE_RECURSE "${depends_package}")
+		file(REMOVE "${package_uncompressed_file}")
+
+		# 5. compilo y genera el paquete en local
+		message("Generating artifact ${PACKAGE} ...")
+		#
+		# ojo: estoy hay que mejorarlo
+		# no queremos usar "-o", queremos que trate de compilar las dependencias (sin -o)
+		# pero queremos que evite compilar cosas que estan en cache remota
+		#
+		execute_process(
+			COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${DEPENDS_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}
+			WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+			RESULT_VARIABLE artifacts_result
+			)
+		if(artifacts_result)
+			message(FATAL_ERROR "can't create artifact ${PACKAGE}: error ${artifacts_result}")
 			file(REMOVE_RECURSE "${depends_bin_package}")
 			file(REMOVE_RECURSE "${depends_package}")
 			file(REMOVE "${package_uncompressed_file}")
-
-			# 5. compilo y genera el paquete en local
-			message("Generating artifact ${PACKAGE} ...")
-			#
-			# ojo: estoy hay que mejorarlo
-			# no queremos usar "-o", queremos que trate de compilar las dependencias (sin -o)
-			# pero queremos que evite compilar cosas que estan en cache remota
-			#
-			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${DEPENDS_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}
-				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-				RESULT_VARIABLE artifacts_result
-				)
-			if(artifacts_result)
-				message(FATAL_ERROR "can't create artifact ${PACKAGE}: error ${artifacts_result}")
-				file(REMOVE_RECURSE "${depends_bin_package}")
-				file(REMOVE_RECURSE "${depends_package}")
-				file(REMOVE "${package_uncompressed_file}")
-			endif()
-
-			#######################################################
-			# 6: obtengo la version del paquete creado
-			execute_process(
-				COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}
-				WORKING_DIRECTORY "${ARTIFACTS_PATH}"
-				OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-			if(RESULT_VERSION)
-				list(GET RESULT_VERSION 0 PACKAGE_MODE)
-				list(GET RESULT_VERSION 1 PACKAGE_NAME)
-				list(GET RESULT_VERSION 2 VERSION)
-			else()
-				message(FATAL_ERROR "-- not found ${PACKAGE}.")
-			endif()
-			#######################################################
-
-			set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz)
-			set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz)
-			set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
-			set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
-
-			# 7. descomprimo el artefacto
-			execute_process(
-				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
-				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
-				RESULT_VARIABLE uncompress_result
-				)
-			if(uncompress_result)
-				message(FATAL_ERROR "Extracting ${package_cmake_generated_file} failed! Error ${uncompress_result}")
-				file(REMOVE_RECURSE "${depends_bin_package}")
-				file(REMOVE_RECURSE "${depends_package}")
-				file(REMOVE "${package_uncompressed_file}")
-				file(REMOVE "${package_generated_file}")
-			endif()
-
-			# y tambien descomprimo el propio tar gz
-			execute_process(
-				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_generated_file}"
-				WORKING_DIRECTORY "${depends_dir}/"
-				RESULT_VARIABLE uncompress_result2
-				)
-			if(uncompress_result2)
-				message(FATAL_ERROR "Extracting ${package_generated_file} failed! Error ${uncompress_result2}")
-				file(REMOVE_RECURSE "${depends_bin_package}")
-				file(REMOVE_RECURSE "${depends_package}")
-				file(REMOVE "${package_uncompressed_file}")
-				file(REMOVE "${package_generated_file}")
-			endif()
-
-			# 8. borro los 2 tar gz
-			file(REMOVE "${package_generated_file}")
-			file(REMOVE "${package_cmake_generated_file}")
-
-		# me lo he descargdo y solo es descomprimirlo
-		elseif(EXISTS "${package_uncompressed_file}")
-
-			# 10. lo descomprimo cacheado
-			execute_process(
-				COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_uncompressed_file}"
-				WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
-				RESULT_VARIABLE uncompress_result)
-			if(uncompress_result)
-				message(FATAL_ERROR "Extracting ${package_uncompressed_file} failed! Error ${uncompress_result}")
-			endif()
-			file(REMOVE "${package_uncompressed_file}")
 		endif()
+
+		#######################################################
+		# 6: obtengo la version del paquete creado
+		execute_process(
+			COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}
+			WORKING_DIRECTORY "${ARTIFACTS_PATH}"
+			OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+		if(RESULT_VERSION)
+			list(GET RESULT_VERSION 0 PACKAGE_MODE)
+			list(GET RESULT_VERSION 1 PACKAGE_NAME)
+			list(GET RESULT_VERSION 2 VERSION)
+		else()
+			message(FATAL_ERROR "-- not found ${PACKAGE}.")
+		endif()
+		#######################################################
+
+		set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz)
+		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz)
+		set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
+		set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
+
+		# 7. descomprimo el artefacto
+		execute_process(
+			COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
+			WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
+			RESULT_VARIABLE uncompress_result
+			)
+		if(uncompress_result)
+			message(FATAL_ERROR "Extracting ${package_cmake_generated_file} failed! Error ${uncompress_result}")
+			file(REMOVE_RECURSE "${depends_bin_package}")
+			file(REMOVE_RECURSE "${depends_package}")
+			file(REMOVE "${package_uncompressed_file}")
+			file(REMOVE "${package_generated_file}")
+		endif()
+
+		# y tambien descomprimo el propio tar gz
+		execute_process(
+			COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_generated_file}"
+			WORKING_DIRECTORY "${depends_dir}/"
+			RESULT_VARIABLE uncompress_result2
+			)
+		if(uncompress_result2)
+			message(FATAL_ERROR "Extracting ${package_generated_file} failed! Error ${uncompress_result2}")
+			file(REMOVE_RECURSE "${depends_bin_package}")
+			file(REMOVE_RECURSE "${depends_package}")
+			file(REMOVE "${package_uncompressed_file}")
+			file(REMOVE "${package_generated_file}")
+		endif()
+
+		# 8. borro los 2 tar gz
+		file(REMOVE "${package_generated_file}")
+		file(REMOVE "${package_cmake_generated_file}")
+
+	# me lo he descargdo y solo es descomprimirlo
+	elseif(EXISTS "${package_uncompressed_file}")
+
+		# 10. lo descomprimo cacheado
+		execute_process(
+			COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_uncompressed_file}"
+			WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
+			RESULT_VARIABLE uncompress_result)
+		if(uncompress_result)
+			message(FATAL_ERROR "Extracting ${package_uncompressed_file} failed! Error ${uncompress_result}")
+		endif()
+		file(REMOVE "${package_uncompressed_file}")
 	endif()
 
 	# 12. hacer find_package tradicional, ahora que tenemos los ficheros de cmake
