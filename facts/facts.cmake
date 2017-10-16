@@ -48,15 +48,19 @@ set(CMAKI_PLATFORM "${RESULT_VERSION}")
 function(cmaki_find_package)
 
 	set(PARAMETERS ${ARGV})
+	list(LENGTH PARAMETERS ARGV_LENGTH)
 	list(GET PARAMETERS 0 PACKAGE)
-	list(GET PARAMETERS 1 VERSION_REQUEST)
+	set(VERSION_REQUEST "")
+	if(ARGV_LENGTH GREATER 1)
+		list(GET PARAMETERS 1 VERSION_REQUEST)
+	endif()
 
 	IF(NOT DEFINED CMAKI_REPOSITORY)
 		# MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
 		set(CMAKI_REPOSITORY "http://artifacts.myftp.biz:8080")
 	ENDIF()
 
-	if(${VERSION_REQUEST} STREQUAL "")
+	if(VERSION_REQUEST STREQUAL "")
 
 		# 1. obtener la version actual (o ninguno en caso de no tener el artefacto)
 		execute_process(
