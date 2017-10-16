@@ -116,7 +116,7 @@ function(cmaki_find_package)
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
 	set(package_marker "${depends_bin_package}/${CMAKI_IDENTIFIER}.cache")
-	if("${NO_USE_CACHE_LOCAL}")
+	if(NO_USE_CACHE_LOCAL STREQUAL "FALSE")
 		# pido un paquete, en funcion de:
 		#		- paquete
 		#		- version
