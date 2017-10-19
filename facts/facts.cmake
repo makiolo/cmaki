@@ -92,6 +92,8 @@ function(cmaki_find_package)
 		set(NO_USE_CACHE_REMOTE "${NOCACHE_REMOTE}")
 	endif()
 
+	message("python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}")
+
 	#######################################################
 	# 2. obtener la mejor version buscando en la cache local y remota
 	execute_process(
