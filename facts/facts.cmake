@@ -114,7 +114,7 @@ function(cmaki_find_package)
 	# 3. si no tengo los ficheros de cmake, los intento descargar
 	set(depends_dir "${DEPENDS_PATH}")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
-	set(depends_package "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}")
+	set(depends_package "${DEPENDS_PATH}/${PACKAGE}-${VERSION}")
 	set(package_marker "${depends_bin_package}/${CMAKI_IDENTIFIER}.cache")
 	# pido un paquete, en funcion de:
 	#		- paquete
@@ -123,8 +123,8 @@ function(cmaki_find_package)
 	#		- modo (COMPATIBLE / EXACT)
 	# Recibo el que mejor se adapta a mis especificaciones
 	# Otra opcion es enviar todos los ficheros de cmake de todas las versiones
-	set(package_uncompressed_file "${CMAKE_PREFIX_PATH}/${PACKAGE}.tmp")
-	set(package_binary_filename "${CMAKE_PREFIX_PATH}/${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz")
+	set(package_uncompressed_file "${DEPENDS_PATH}/${PACKAGE}.tmp")
+	set(package_binary_filename "${DEPENDS_PATH}/${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz")
 	# message("marca: ${package_marker}")
 	# message("binario: ${package_binary_filename}")
 	IF(EXISTS "${package_marker}" AND EXISTS "${package_binary_filename}")
@@ -187,13 +187,13 @@ function(cmaki_find_package)
 
 		set(package_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}.tar.gz)
 		set(package_cmake_filename ${PACKAGE}-${VERSION}-${CMAKI_IDENTIFIER}-cmake.tar.gz)
-		set(package_generated_file ${CMAKE_PREFIX_PATH}/${package_filename})
-		set(package_cmake_generated_file ${CMAKE_PREFIX_PATH}/${package_cmake_filename})
+		set(package_generated_file ${DEPENDS_PATH}/${package_filename})
+		set(package_cmake_generated_file ${DEPENDS_PATH}/${package_cmake_filename})
 
 		# 7. descomprimo el artefacto
 		execute_process(
 			COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_cmake_generated_file}"
-			WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
+			WORKING_DIRECTORY "${DEPENDS_PATH}/"
 			RESULT_VARIABLE uncompress_result
 			)
 		if(uncompress_result)
@@ -228,7 +228,7 @@ function(cmaki_find_package)
 		# 10. lo descomprimo cacheado
 		execute_process(
 			COMMAND "${CMAKE_COMMAND}" -E tar zxf "${package_uncompressed_file}"
-			WORKING_DIRECTORY "${CMAKE_PREFIX_PATH}/"
+			WORKING_DIRECTORY "${DEPENDS_PATH}/"
 			RESULT_VARIABLE uncompress_result)
 		if(uncompress_result)
 			message(FATAL_ERROR "Extracting ${package_uncompressed_file} failed! Error ${uncompress_result}")
