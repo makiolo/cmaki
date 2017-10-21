@@ -92,8 +92,6 @@ function(cmaki_find_package)
 		set(NO_USE_CACHE_REMOTE "${NOCACHE_REMOTE}")
 	endif()
 
-	message("python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}")
-
 	#######################################################
 	# 2. obtener la mejor version buscando en la cache local y remota
 	execute_process(
@@ -161,7 +159,7 @@ function(cmaki_find_package)
 		# pero queremos que evite compilar cosas que estan en cache remota
 		#
 		execute_process(
-			COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${DEPENDS_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY}
+			COMMAND python ${ARTIFACTS_PATH}/build.py ${PACKAGE} --depends=${DEPENDS_PATHFILE} --cmakefiles=${CMAKI_PATH} --prefix=${DEPENDS_PATH} --third-party-dir=${CMAKE_PREFIX_PATH} --server=${CMAKI_REPOSITORY} --no-run-tests -d
 			WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 			RESULT_VARIABLE artifacts_result
 			)
