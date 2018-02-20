@@ -112,7 +112,7 @@ function(cmaki_find_package)
 	#######################################################
 
 	# 3. si no tengo los ficheros de cmake, los intento descargar
-	set(depends_dir "${CMAKE_PREFIX_PATH}")
+	set(depends_dir "${DEPENDS_PATH}")
 	set(depends_bin_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(depends_package "${depends_dir}/${PACKAGE}-${VERSION}")
 	set(package_marker "${depends_bin_package}/${CMAKI_IDENTIFIER}.cache")
@@ -340,7 +340,7 @@ macro(cmaki_download_package)
 	get_filename_component(package_name_version "${package_dir}" NAME)
 	set(package_filename "${package_name_version}-${CMAKI_IDENTIFIER}.tar.gz")
 	set(http_package_filename ${CMAKI_REPOSITORY}/download.php?file=${package_filename})
-	set(depends_dir "${CMAKE_PREFIX_PATH}")
+	set(depends_dir "${DEPENDS_PATH}")
 	get_filename_component(depends_dir "${depends_dir}" ABSOLUTE)
 	set(package_compessed "${depends_dir}/${package_name_version}.tar.gz")
 	set(package_target "${depends_dir}/${package_filename}")
