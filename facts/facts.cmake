@@ -170,10 +170,13 @@ function(cmaki_find_package)
 			file(REMOVE "${package_uncompressed_file}")
 		endif()
 
+		# TODO: como obtener la version recien compilada ?
+
 		#######################################################
 		# 6: obtengo la version del paquete creado
 		execute_process(
-			COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}
+			# COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE} ${EXTRA_VERSION}
+			COMMAND python ${ARTIFACTS_PATH}/check_remote_version.py --server=${CMAKI_REPOSITORY} --artifacts=${CMAKE_PREFIX_PATH} --platform=${CMAKI_IDENTIFIER} --name=${PACKAGE}
 			WORKING_DIRECTORY "${ARTIFACTS_PATH}"
 			OUTPUT_VARIABLE RESULT_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 		if(RESULT_VERSION)
