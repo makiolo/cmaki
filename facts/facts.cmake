@@ -57,7 +57,8 @@ function(cmaki_find_package)
 
 	IF(NOT DEFINED CMAKI_REPOSITORY)
 		# MESSAGE(FATAL_ERROR "CMAKI_REPOSITORY: is not defined")
-		set(CMAKI_REPOSITORY "http://artifacts.myftp.biz:8080")
+		# set(CMAKI_REPOSITORY "http://artifacts.myftp.biz:8080")
+		set(CMAKI_REPOSITORY "http://192.168.0.4:8080")
 	ENDIF()
 
 	if(VERSION_REQUEST STREQUAL "")
